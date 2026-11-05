@@ -16,6 +16,12 @@ ktr = [r for r in K2 if r["split"] == "tr"]; kte = [r for r in K2 if r["split"] 
 if which == "wg":
     Q = json.load(open("data/wg_all_718tr_880te.json"))   # train order: same rows as all_rows() first; test: same order
     qtr = [r for r in Q if r["split"] == "tr"][:len(ktr)]; qte = [r for r in Q if r["split"] == "te"][:len(kte)]
+    # add the natural-mix calibration rows, when K2 has them (same rows as Qwen's wg_natural_train*.json)
+    for b, qfile in [(1, "data/wg_natural_train.json"), (2, "data/wg_natural_train2.json")]:
+        kf = f"data/k2-horizon/wg_natural_b{b}.json"
+        if os.path.exists(kf):
+            kn = json.load(open(kf)); qn = json.load(open(qfile))[:len(kn)]
+            ktr += kn; qtr += qn
     assert [r["y"] for r in qtr] == [r["y"] for r in ktr] and [r["y"] for r in qte] == [r["y"] for r in kte], "row mismatch"
     scorer, extra = "scripts/score/wildguard.py", ["--natural-weights"]
 else:

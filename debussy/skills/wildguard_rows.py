@@ -23,3 +23,15 @@ def all_rows():
     te500 = te.sample(500, random_state=0)
     parts = [("tr", cal0), ("tr", batches[0]), ("tr", batches[1]), ("te", te500)]
     return [(s, r) for s, df in parts for _, r in df.iterrows()]
+
+
+def natural_rows(n, batch=1):
+    """Calibration rows drawn at random (the training split's natural label mix), excluding every row in all_rows().
+    Batch 1 = 170 rows (seed 7); batch b > 1 first removes the earlier batches (170 rows each), then samples with seed 6+b.
+    Identical to what scripts/run/wildguard_natural_train.py used for Qwen, so both base models see the same rows."""
+    tr = pd.read_parquet(D + "wg_wildguard_train.parquet").dropna(subset=["response_harm_label", "response_refusal_label"])
+    used = {(r["prompt"], r["response"]) for s, r in all_rows() if s == "tr"}
+    pool = tr[~pd.Series([(p, q) in used for p, q in zip(tr.prompt, tr.response)], index=tr.index)]
+    for b in range(1, batch):
+        pool = pool.drop(index=list(pool.sample(170, random_state=6 + b).index))
+    return pool.sample(n, random_state=6 + batch)
