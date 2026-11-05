@@ -50,6 +50,7 @@ class _InProc:
         self.llm = Llama(model_path=path, n_ctx=n_ctx, n_threads=os.cpu_count() or 4, n_batch=512, verbose=False)
 
     def tok(self, s, special=False): return self.llm.tokenize(s.encode(), add_bos=False, special=special)
+    def detok(self, ids): return self.llm.detokenize(ids).decode("utf-8", "ignore")
     def first_id(self, s): return self.tok(s)[0]
 
     def logits_after(self, text, keep_state=False):
@@ -87,6 +88,7 @@ class _Server:
         return self._post("/tokenize", {"content": s, "add_special": False, "parse_special": special})["tokens"]
 
     def first_id(self, s): return self.tok(s)[0]
+    def detok(self, ids): return self._post("/detokenize", {"tokens": list(ids)})["content"]
 
     def _next_logprobs(self, text):
         r = self._post("/completion", {"prompt": text, "n_predict": 1, "n_probs": self.n_probs, "temperature": 0,
@@ -155,6 +157,12 @@ class Engine:
         v = self.b.logits_after(text)
         v = v[ids] if isinstance(v, np.ndarray) else self.b._vec(v, ids)
         pr = np.exp(v - v.max()); return pr / pr.sum()
+
+
+def keep_last_tokens(e, text, n):
+    """Trim text to its last n tokens (by the engine's own tokenizer), marking the cut."""
+    t = e.b.tok(text)
+    return text if len(t) <= n else "[...]\n" + e.b.detok(t[-n:])
 
 
 def get_engine(**kw):

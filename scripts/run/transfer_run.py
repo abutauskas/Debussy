@@ -36,9 +36,8 @@ def resumable(name, items, fn, every=20):
 def run_hle(e, n=None):
     from debussy.skills.hle import load
     def f(q):
-        text = q["q"]
-        if len(text) > 20000:  # one 13.5k-token question: keep its end (the answer choices), ~8k tokens like the Qwen run
-            text = "[...]\n" + text[-20000:]
+        from debussy.engine import keep_last_tokens
+        text = keep_last_tokens(e, q["q"], 8000)  # one 13.5k-token question: keep its last 8k tokens (the answer choices), like the Qwen run
         pr = e.letter_probs(MC + text, q["letters"])
         return {"id": q["id"], "letters": q["letters"], "p": pr.round(5).tolist(), "pred": q["letters"][int(pr.argmax())],
                 "ans": q["ans"], "cat": q["cat"], "n_tokens": None}
