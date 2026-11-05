@@ -100,6 +100,34 @@ def run_wg(e, ncal, nte):
     resumable("wg", items, f)
 
 
+def _w2c_row(e, it):
+    from debussy.skills.when2call import Q, tool_lines
+    req = "unknown (tool not in the list)"
+    for t in it["tools"]:
+        t = json.loads(t) if isinstance(t, str) else t
+        if t.get("name") == it["name"]:
+            p = t.get("parameters", {}) or {}; req = ", ".join(p.get("required", t.get("required", [])) or []) or "none"
+    qs = {k: v.format(call=it["call"][:600], name=it["name"], rfi=it["rfi"][:400], req=req) for k, v in Q.items()}
+    avail = it["name"] in {(json.loads(x) if isinstance(x, str) else x).get("name") for x in it["tools"]}
+    return {"split": it["split"], "y": it["y"], "avail": avail,
+            "lo": e.yes_no(f"Available tools:\n{tool_lines(it['tools'])}\n\nUser request: {it['q']}\n\n", qs)}
+
+
+def run_w2c_more_train(e, base, total):
+    """Extra When2Call TRAIN pairs: per class, those in the first `total` but not the first `base` (no overlap)."""
+    from debussy.skills.when2call import build_items
+    old = {(it["q"], it["call"]) for it in build_items(base, 0)}
+    items = [it for it in build_items(total, 0) if (it["q"], it["call"]) not in old]
+    resumable(f"w2c_train_{base}to{total}", items, lambda it: _w2c_row(e, it))
+
+
+def run_w2c_more_test(e, start, end):
+    """Extra When2Call TEST items [start, end) of the fixed test order."""
+    from debussy.skills.when2call import build_items
+    items = [it for it in build_items(150, 600) if it["split"] == "te"][start:end]
+    resumable(f"w2c_test_{start}to{end}", items, lambda it: _w2c_row(e, it))
+
+
 def run_wg_natural(e, n, batch):
     """WildGuard calibration rows at the natural label mix (same rows as Qwen's wildguard_natural_train.py run)."""
     from debussy.skills.wildguard_rows import natural_rows
@@ -127,4 +155,6 @@ if __name__ == "__main__":
     print(f"profile={PROFILE} backend={os.environ.get('DEBUSSY_BACKEND','inproc')} skill={skill}", flush=True)
     {"hle": lambda: run_hle(e, *(args or [None])),"omni_public": lambda: run_omni_public(e), "mmlu_proxy": lambda: run_mmlu_proxy(e, *(args or [400])),
      "w2c": lambda: run_w2c(e, *(args or [200, 300])), "wg": lambda: run_wg(e, *(args or [300, 500])),
-     "wg_natural": lambda: run_wg_natural(e, *(args or [170, 1]))}[skill]()
+     "wg_natural": lambda: run_wg_natural(e, *(args or [170, 1])),
+     "w2c_more_train": lambda: run_w2c_more_train(e, *(args or [100, 250])),
+     "w2c_more_test": lambda: run_w2c_more_test(e, *(args or [150, 300]))}[skill]()
