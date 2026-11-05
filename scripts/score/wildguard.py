@@ -91,5 +91,6 @@ print(f"AVERAGE F1 (method chosen on train): {np.mean(chosen_f1):.3f}")
 if "--save" in sys.argv:
     import os
     from debussy.paths import HEADS
+    HEADS = sys.argv[sys.argv.index("--heads") + 1] if "--heads" in sys.argv else HEADS  # e.g. debussy/heads_k2-horizon.json
     h = json.load(open(HEADS)) if os.path.exists(HEADS) else {}
-    h["wildguard"] = heads; json.dump(h, open(HEADS, "w"), indent=1); print("saved wildguard heads -> heads.json")
+    h["wildguard"] = heads; json.dump(h, open(HEADS, "w"), indent=1); print("saved wildguard heads ->", HEADS)

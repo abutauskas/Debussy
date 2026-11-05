@@ -30,11 +30,12 @@ cut = min(0.0, float(np.percentile([r["lo"]["exist"] for r in tr], 1)))
 print(f"tool-exists cut-off (from train): {cut:.2f}")
 if "--save" in sys.argv:
     from debussy.paths import HEADS
+    HEADS = sys.argv[sys.argv.index("--heads") + 1] if "--heads" in sys.argv else HEADS  # e.g. debussy/heads_k2-horizon.json
     h = json.load(open(HEADS)) if os.path.exists(HEADS) else {}
     h["when2call"] = {"features": best, "coef": m.coef_[0].round(4).tolist(), "intercept": round(float(m.intercept_[0]), 4),
                       "exist_cutoff": round(cut, 4),
                       "note": "P(request_for_info | tool usable); features by 5-fold CV on TRAIN (n=%d); exist_cutoff = 1st pct of TRAIN" % len(tr)}
-    json.dump(h, open(HEADS, "w"), indent=1); print("saved when2call head -> heads.json")
+    json.dump(h, open(HEADS, "w"), indent=1); print("saved when2call head ->", HEADS)
 if not te: sys.exit()
 y = np.array([r["y"] for r in te]); tcrfi = m.predict(F(te, best))
 for name, unavailable in [("A tool-list check", np.array([not r["avail"] for r in te])),
