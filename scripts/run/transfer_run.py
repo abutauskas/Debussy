@@ -37,8 +37,8 @@ def run_hle(e, n=None):
     from debussy.skills.hle import load
     def f(q):
         text = q["q"]
-        if len(text) > 30000:  # a single 13.5k-token question: keep its end (the answer choices), like the Qwen run
-            text = "[...]\n" + text[-30000:]
+        if len(text) > 20000:  # one 13.5k-token question: keep its end (the answer choices), ~8k tokens like the Qwen run
+            text = "[...]\n" + text[-20000:]
         pr = e.letter_probs(MC + text, q["letters"])
         return {"id": q["id"], "letters": q["letters"], "p": pr.round(5).tolist(), "pred": q["letters"][int(pr.argmax())],
                 "ans": q["ans"], "cat": q["cat"], "n_tokens": None}
