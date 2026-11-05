@@ -8,14 +8,14 @@ built on a 4-core CPU with no GPU and no API key. One small open model answers s
 option. When unsure, Debussy prefers an honest "I don't know" over a guess.
 
 **Estimated Decision Index ≈ 61** (When2Call 92.8 · WildGuardTest 0.899 · HLE 10.5 · Omniscience stand-in 51.8).
-This is our own estimate, not an official score. Details, methods and caveats: **[RESULTS.md](RESULTS.md)**.
+This is our own estimate, not an official score. Details, methods and caveats: **[docs/RESULTS.md](docs/RESULTS.md)**.
 
 ## Use it
 ```bash
 pip install llama-cpp-python==0.3.36 numpy pandas pyarrow scikit-learn
 mkdir -p models && curl -L -o models/Qwen3.5-4B-Q4_K_M.gguf \
   https://huggingface.co/unsloth/Qwen3.5-4B-GGUF/resolve/main/Qwen3.5-4B-Q4_K_M.gguf
-python debussy.py          # three demo decisions
+python -m debussy.model    # three demo decisions (run from the repository root)
 ```
 ```python
 from debussy import Debussy
@@ -26,15 +26,23 @@ d.choice(question, options + ["I don't know"])   # abstains when it is not confi
 ```
 
 ## Layout
-- `debussy.py`, `heads.json`: the packaged model
-- `engine.py`, `TRANSFER.md`: the model-agnostic core; Debussy's skills run on any base model through a profile
-  (Qwen3.5 and K2-Horizon so far)
-- `w2c_*.py`, `wildguard_yesno.py`, `wg_*.py`, `omni_*.py`, `hle_eval.py`: running each benchmark skill
-- `score_*.py`, `verdict.py`, `parity_check.py`, `engine_check.py`: scoring, head fitting (train-only choices) and checks
-- `transfer_run.py`: run every skill on a new base model
-- `lm_decide.py`, `when2call_head.py`, `extract_lm_feats.py`, `train_lora.py`, `decompose.py`: early experiments
-- `brand/`: logo (an arabesque note with a crescent-moon head), wordmarks, exports
-- `data/README.md`: how to get the datasets (not stored here; some are gated)
+```
+debussy/                 the model (Python package)
+  model.py                 Debussy class: when2call(), wildguard(), choice()
+  engine.py                model-agnostic core: base-model profiles + backends (see docs/TRANSFER.md)
+  heads.json               trained head weights and thresholds (tiny)
+  paths.py                 where data/, models/ and heads.json live
+  skills/                  when2call · wildguard · wildguard_rows · hle · omniscience · knowledge_proxy · retrieval
+scripts/
+  run/                     extra batches and running skills on a new base model (transfer_run.py)
+  score/                   scoring and head fitting (choices made on training data only), verdict.py
+  checks/                  parity_check.py (package = pipeline), engine_check.py (engine = saved results)
+experiments/             early attempts: embedding classifier, probes, CPU LoRA, decomposed checks
+docs/                    RESULTS.md (scores, methods, caveats) · TRANSFER.md (moving to a new base model)
+brand/                   logo, wordmarks, exports; archive/ holds earlier logo versions
+data/README.md           how to get the datasets (not stored here; some are gated)
+```
+Scripts in `scripts/` run from anywhere; package modules run as `python -m debussy.skills.<name>` from the repository root.
 
 ## Name
 After the composer Claude Debussy: the logo is a *Clair de lune* crescent and an *Arabesque* curl, and the name is

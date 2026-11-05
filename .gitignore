@@ -8,6 +8,7 @@ data/*
 *.tar.xz.sha256
 
 # Model weights (download them; see README)
+models
 models/
 *.gguf
 *.safetensors
