@@ -11,7 +11,8 @@
    1.4619
   ],
   "intercept": -0.5988,
-  "note": "P(request_for_info | tool usable); features chosen by 5-fold CV on When2Call TRAIN pairs (n=799)"
+  "exist_cutoff": -0.2512,
+  "note": "P(request_for_info | tool usable); features by 5-fold CV on TRAIN (n=799); exist_cutoff = 1st pct of TRAIN"
  },
  "wildguard": {
   "prompt_harm": {

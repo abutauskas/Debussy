@@ -21,7 +21,7 @@ for t, r in zip(T[:n], ref[:n]):
     mine = max(L, key=lambda k: p[k])
     sig = lambda x: 1 / (1 + np.exp(-x)); lo = r["lo"]
     p_rfi = sig(h["intercept"] + sum(c * lo[f] for c, f in zip(h["coef"], h["features"])))
-    theirs = "cannot_answer" if lo["exist"] < 0 else ("request_for_info" if p_rfi > 0.5 else "tool_call")
+    theirs = "cannot_answer" if lo["exist"] < h.get("exist_cutoff", 0.0) else ("request_for_info" if p_rfi > 0.5 else "tool_call")
     agree += mine == theirs
 print(f"When2Call: packaged vs pipeline decisions agree on {agree}/{n}")
 

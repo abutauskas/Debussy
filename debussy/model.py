@@ -67,7 +67,7 @@ class Debussy:
         lo = self._yes_logodds(f"<|im_start|>user\nAvailable tools:\n{tool_lines(tools)}\n\nUser request: {user_msg}\n\n", qs)
         h = self.h.get("when2call", {"features": ["args", "rfi"], "coef": [-0.8, -0.5], "intercept": -0.5})
         p_rfi = sig(h["intercept"] + sum(c * lo[f] for c, f in zip(h["coef"], h["features"])))   # P(ask | tool usable)
-        p_ok = sig(lo["exist"])                                                                    # P(tool usable)
+        p_ok = sig(lo["exist"] - h.get("exist_cutoff", 0.0))                                       # P(tool usable)
         if check_tool_list:
             names = {(json.loads(t) if isinstance(t, str) else t).get("name") for t in tools}
             p_ok = p_ok if name in names else 0.0
