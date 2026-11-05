@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 128" width="430" height="128" role="img" aria-label="Debussy">
+  <g transform="translate(-4 2)" fill="#4536C9">
+    <defs><mask id="dbl" maskUnits="userSpaceOnUse" x="0" y="0" width="128" height="128"><rect x="-50" y="-50" width="300" height="300" fill="#fff"/><circle cx="43" cy="73" r="18.5" fill="#000"/></mask></defs>
+    <circle cx="51" cy="85" r="23" mask="url(#dbl)"/>
+    <path d="M69 81 L69 41 C69 21, 97 17, 100.5 35.5 C103 50, 86.5 55, 82 44.5"
+          fill="none" stroke="#4536C9" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="124" y="88" font-family="'Helvetica Neue', 'Inter', Arial, sans-serif" font-weight="600" font-size="58"
+        letter-spacing="-1" fill="#17153A">Debussy</text>
+</svg>

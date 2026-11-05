@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 128" width="520" height="128" role="img" aria-label="Debussy">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#232A5C"/>
+      <stop offset="1" stop-color="#121633"/>
+    </linearGradient>
+    <mask id="crescent">
+      <rect width="128" height="128" fill="#fff"/>
+      <circle cx="53" cy="37" r="15" fill="#000"/>
+    </mask>
+  </defs>
+  <circle cx="64" cy="64" r="64" fill="url(#sky)"/>
+  <!-- Clair de lune: crescent moon -->
+  <circle cx="45" cy="43" r="16" fill="#F2D27A" mask="url(#crescent)"/>
+  <!-- La Mer / the staff: three options -->
+  <g fill="none" stroke="#9FB3F2" stroke-width="3.2" stroke-linecap="round" opacity="0.9">
+    <path d="M24 70 C 40 64, 54 76, 70 70 S 96 64, 104 70"/>
+    <path d="M22 84 C 38 78, 54 90, 70 84 S 98 78, 106 84"/>
+    <path d="M26 98 C 42 92, 56 104, 72 98 S 96 92, 102 98"/>
+  </g>
+  <!-- the decision: one note on one line -->
+  <g fill="#F2D27A">
+    <ellipse cx="79" cy="83" rx="8.6" ry="6.3" transform="rotate(-22 79 83)"/>
+    <rect x="85.3" y="48" width="3.3" height="34" rx="1.65"/>
+  </g>
+  <text x="156" y="72" font-family="Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif" font-size="64" letter-spacing="1" fill="#1B2150">Debussy</text>
+  <text x="159" y="110" font-family="'Helvetica Neue', Arial, sans-serif" font-size="15" letter-spacing="3.2" fill="#5A6496">FAST DECISIONS · SYSTEM 1</text>
+</svg>

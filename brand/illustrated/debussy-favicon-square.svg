@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Debussy">
+  <defs>
+    <mask id="c"><rect width="32" height="32" fill="#fff"/><circle cx="14.5" cy="10" r="6.2" fill="#000"/></mask>
+  </defs>
+  <rect width="32" height="32" rx="7" fill="#1A1F47"/>
+  <circle cx="11" cy="12" r="6.5" fill="#F2D27A" mask="url(#c)"/>
+  <path d="M4 24.5 C 9 22.5, 13 26.5, 18 24.5 S 25 22.5, 28 24.5" fill="none" stroke="#9FB3F2" stroke-width="1.8" stroke-linecap="round"/>
+  <ellipse cx="21" cy="22" rx="3.4" ry="2.5" transform="rotate(-22 21 22)" fill="#F2D27A"/>
+  <rect x="23.4" y="8" width="1.6" height="13.6" rx="0.8" fill="#F2D27A"/>
+</svg>

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 128" width="520" height="128" role="img" aria-label="Debussy">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#232A5C"/>
+      <stop offset="1" stop-color="#121633"/>
+    </linearGradient>
+    <mask id="crescent">
+      <rect width="128" height="128" fill="#fff"/>
+      <circle cx="52" cy="34" r="17" fill="#000"/>
+    </mask>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#sky)"/>
+  <circle cx="42" cy="40" r="18" fill="#F2D27A" mask="url(#crescent)"/>
+  <g fill="none" stroke="#9FB3F2" stroke-width="3.2" stroke-linecap="round" opacity="0.9">
+    <path d="M18 72 C 36 66, 52 78, 70 72 S 100 66, 110 72"/>
+    <path d="M18 86 C 36 80, 52 92, 70 86 S 100 80, 110 86"/>
+    <path d="M18 100 C 36 94, 52 106, 70 100 S 100 94, 110 100"/>
+  </g>
+  <g fill="#F2D27A">
+    <ellipse cx="82" cy="85" rx="9" ry="6.6" transform="rotate(-22 82 85)"/>
+    <rect x="88.6" y="48" width="3.4" height="36" rx="1.7"/>
+  </g>
+  <text x="156" y="82" font-family="Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif"
+        font-size="64" letter-spacing="1" fill="#1B2150">Debussy</text>
+  <text x="159" y="108" font-family="'Helvetica Neue', Arial, sans-serif" font-size="15" letter-spacing="3.2"
+        fill="#5A6496">FAST DECISIONS · SYSTEM 1</text>
+</svg>

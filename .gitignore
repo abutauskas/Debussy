@@ -1,0 +1,24 @@
+# Datasets: several are gated (WildGuardMix, HLE) and must not be redistributed. See data/README.md.
+data/*
+!data/README.md
+*.parquet
+*.jsonl
+*.npz
+*.tar.xz
+*.tar.xz.sha256
+
+# Model weights (download them; see README)
+models/
+*.gguf
+*.safetensors
+lora_*/
+
+# Secrets
+.env
+*.token
+
+# Python / tooling
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
