@@ -7,7 +7,7 @@ built on a 4-core CPU with no GPU and no API key. One small open model answers s
 (no step-by-step reasoning), and tiny calibrated heads (`heads.json`) turn those answers into a probability for every
 option. When unsure, Debussy prefers an honest "I don't know" over a guess.
 
-**Estimated Decision Index ≈ 61** (When2Call 92.8 · WildGuardTest 0.899 · HLE 10.5 · Omniscience stand-in 51.8).
+**Estimated Decision Index ≈ 61.4** (When2Call 93.2 · WildGuardTest 0.899 · HLE 10.5 · Omniscience stand-in 51.8).
 This is our own estimate, not an official score. Details, methods and caveats: **[docs/RESULTS.md](docs/RESULTS.md)**.
 
 ## Use it

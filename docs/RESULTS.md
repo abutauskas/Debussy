@@ -12,7 +12,7 @@ Artificial Analysis uses.
 
 | Benchmark (25% of index each) | Start of project | **Debussy** | Test size | Leaders* |
 |---|---|---|---|---|
-| When2Call (accuracy) | 38% (0.8B zero-shot) | **92.8%** model-only, 94.3% with tool-list check | 600 | 84 / 92.6 |
+| When2Call (accuracy) | 38% (0.8B zero-shot) | **93.2%** model-only, 94.3% with tool-list check | 600 | 84 / 92.6 |
 | WildGuardTest (avg F1, annotator-agreed rows) | 0.69 (0.8B probe, all rows) | **0.899** | 880 (all agreed rows) | ~95 |
 | AA-Omniscience-Decision (½ accuracy + ½ non-hallucination) | n/a | **51.8** on AA's public sample (stand-in; real set is private) | 266 | ~35-50 |
 | HLE-MultiChoice (accuracy) | n/a | **10.5%** (chance 16.4%) | all 513 (same set as AA) | 21-24 |
@@ -20,7 +20,7 @@ Artificial Analysis uses.
 \*Leader numbers from the Artificial Analysis article (Oct 2026) and the BenchLM snapshot the user shared; the
 leaderboard changes over time.
 
-**Index estimate:** 0.25 × (92.8 + 89.9 + 10.5 + 51.8) ≈ **61**. For comparison, Artificial Analysis's launch article
+**Index estimate:** 0.25 × (93.2 + 89.9 + 10.5 + 51.8) ≈ **61.4**. For comparison, Artificial Analysis's launch article
 lists the best decision model at 58 and Claude Haiku 5.5 (Low) at 61; a later snapshot shows ~65 at the top. This is
 an **estimate, not a measured leaderboard score**: Artificial Analysis runs its own harness, and the Omniscience
 questions are private. This is an
@@ -39,7 +39,8 @@ the tools and request once, saves the model state, then asks five short yes/no q
 A small logistic head (fit on 799 When2Call TRAIN pairs; cross-validation kept checks 2, 3 and 5) turns them into **call the tool** vs **ask for info**.
 History: 38% zero-shot → 58% embedding classifier → 63% 0.8B probe → 59% LoRA fine-tune (CPU) → 89% (checks 1, 2, 4)
 → 91.8% (all five, 300 training pairs) → 92.9% (500 pairs, 425 test questions) → 92.7% (500 pairs, 600 test questions)
-→ **92.8%** (799 pairs, 600 test questions). Gains from more pairs have flattened out: the head has learned what these
+→ 92.8% (799 pairs, 600 test questions) → **93.2%** with the tool-exists cut-off chosen on training data (-0.25: the
+level 99% of real training tools pass, instead of a fixed 0). Gains from more pairs have flattened out: the head has learned what these
 five checks can tell it. Remaining errors are almost all tool-call ↔ ask-for-info confusions.
 
 **WildGuardTest.** One pass reads the conversation plus three questions (harmful request? / refusal? /
@@ -85,7 +86,7 @@ vs 66.3). So Debussy hides any "I don't know" option from the model and abstains
 - **Sample sizes** (CPU budget): When2Call 600 of 3,652 test questions (±~2 points, 95% CI); WildGuard uses all 880 agreed rows (±~2).
 - **When2Call tool-list quirk:** in this test set every "cannot answer" item's proposed call names a tool that is
   not in the tool list. "Never call a tool you don't have" is a legitimate rule, but it is also a dataset artifact,
-  so the headline uses the **model-only** score (92.8%); the string check (94.3%) is opt-in. Artificial Analysis also
+  so the headline uses the **model-only** score (93.2%); the string check (94.3%) is opt-in. Artificial Analysis also
   drops 229 ambiguous "ask for info" items; we could not identify them, so our test set includes them.
 - **WildGuard:** we used the 880 rows where all annotators agreed (AA uses 835 of them); responses and prompts are
   clipped to 600 tokens each.
