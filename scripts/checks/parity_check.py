@@ -1,6 +1,7 @@
 """Check that the packaged debussy.py makes the same decisions as the research pipeline behind RESULTS.md.
 
-usage: python parity_check.py N     (N When2Call test items + N WildGuard test rows)
+usage: python scripts/checks/parity_check.py N [profile backend]   (N When2Call test items + N WildGuard test rows)
+       e.g. python scripts/checks/parity_check.py 5 k2-horizon server   (needs a running llama-server with K2)
 """
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))  # repo root on the path
@@ -11,10 +12,13 @@ from debussy.model import Debussy
 from debussy.skills.when2call import build_items
 from debussy.skills.wildguard_rows import all_rows
 
-n = int(sys.argv[1]); d = Debussy(); L = ["tool_call", "request_for_info", "cannot_answer"]
+n = int(sys.argv[1]); profile = sys.argv[2] if len(sys.argv) > 2 else "qwen3.5"; backend = sys.argv[3] if len(sys.argv) > 3 else "inproc"
+d = Debussy(profile=profile, backend=backend); L = ["tool_call", "request_for_info", "cannot_answer"]
+REF = ({"w2c": "data/w2o2_4b_all_500tr.json", "wg": "data/wg_all_638tr.json"} if profile == "qwen3.5" else
+       {"w2c": f"data/{profile}/w2c_500tr_300te.json", "wg": f"data/{profile}/wg_all_400cal.json"})
 T = [json.loads(l) for l in open("data/w2c_when2call_test_mcq.jsonl")]
 import random; random.Random(0).shuffle(T)
-ref = [r for r in json.load(open("data/w2o2_4b_all_500tr.json")) if r["split"] == "te"]
+ref = [r for r in json.load(open(REF["w2c"])) if r["split"] == "te"]
 h = d.h["when2call"]; agree = 0
 for t, r in zip(T[:n], ref[:n]):
     p = d.when2call(t["tools"], t["question"], t["answers"])
@@ -26,7 +30,7 @@ for t, r in zip(T[:n], ref[:n]):
 print(f"When2Call: packaged vs pipeline decisions agree on {agree}/{n}")
 
 R = [x for x in all_rows() if x[0] == "te"][:n]
-refw = [r for r in json.load(open("data/wg_all_638tr.json")) if r["split"] == "te"][:n]
+refw = [r for r in json.load(open(REF["wg"])) if r["split"] == "te"][:n]
 H = d.h["wildguard"]; agree = tot = 0; maxdiff = 0
 for (_, row), r in zip(R, refw):
     p = d.wildguard(row["prompt"], row["response"])

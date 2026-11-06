@@ -62,13 +62,13 @@
    "rfi_needed"
   ],
   "coef": [
-   -0.4971,
-   -0.4666,
-   -0.9284,
-   1.7405
+   -0.4857,
+   -0.3072,
+   -0.9231,
+   1.9373
   ],
-  "intercept": -1.2868,
-  "exist_cutoff": -1.2865,
-  "note": "P(request_for_info | tool usable); features by 5-fold CV on TRAIN (n=200); exist_cutoff = 1st pct of TRAIN"
+  "intercept": -0.746,
+  "exist_cutoff": -1.1512,
+  "note": "P(request_for_info | tool usable); features by 5-fold CV on TRAIN (n=500); exist_cutoff = 1st pct of TRAIN"
  }
 }

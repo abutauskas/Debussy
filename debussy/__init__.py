@@ -11,6 +11,9 @@ def __getattr__(name):
     if name == "Debussy":
         from .model import Debussy
         return Debussy
+    if name == "DebussyDuo":
+        from .model import DebussyDuo
+        return DebussyDuo
     if name == "get_engine":
         from .engine import get_engine
         return get_engine
