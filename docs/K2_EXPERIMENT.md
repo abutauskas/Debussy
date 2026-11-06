@@ -33,6 +33,12 @@ Every comparison below uses **identical training/calibration rows and identical 
   with the same natural-mix rows Qwen got, K2 pulled ahead (0.928 vs 0.898).
 - **K2 is overconfident.** Its own "I don't know" threshold is 0.9 (Qwen: 0.7). With it, K2 answers only 9% of obscure
   questions and is honest on 98% of the rest.
+- **Reading K2's internal state did not beat its own confidence (a negative result).** We trained a small "honesty
+  detector" (logistic regression on K2's last hidden state at the answer point, plus its confidence) on the 400 practice
+  questions to predict "this answer will be right". On the Omniscience stand-in it scored 51.8 against 53.1 for the
+  plain confidence rule, and none of 8 variants beat the rule even on the practice set, so Debussy keeps the rule.
+  The likely reason is that the practice questions (K2 right on 65%) look nothing like Omniscience's obscure ones
+  (K2 answers 9%). Code: `scripts/run/k2_embed.py`, `scripts/score/honesty_probe.py`.
 - **Small-sample swings are real.** K2's HLE lead looked like +5 on the first 150 questions and settled at +3 over 513.
 - Fixes found along the way (they help both models): a train-chosen "tool exists" cut-off (Qwen 92.8 → 93.2% on When2Call),
   token-based trimming of over-long inputs, and llama-server settings that fit 15 GB of RAM (`--cache-ram 0`).
@@ -53,4 +59,6 @@ python scripts/run/transfer_run.py omni_public && python scripts/run/transfer_ru
 python scripts/run/transfer_run.py wg 150 300 && python scripts/run/transfer_run.py wg_natural 170 1 && python scripts/run/transfer_run.py wg_natural 80 2
 python scripts/run/transfer_run.py w2c 100 150 && python scripts/run/transfer_run.py w2c_more_train 100 250 && python scripts/run/transfer_run.py w2c_more_test 150 300
 python scripts/score/compare_bases.py wg                        # identical rows for both models
+python scripts/checks/parity_check.py 5 k2-horizon server       # packaged Debussy = research pipeline, on K2
+python -m debussy.model duo                                     # the two-specialist variant (Qwen in-process + K2 server)
 ```

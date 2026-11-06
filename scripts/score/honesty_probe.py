@@ -5,6 +5,9 @@ picks the abstain threshold there, then applies both unchanged to the AA public 
 Baseline: K2's own confidence rule (answer only if top probability >= 0.9, also chosen on the practice set).
 
 usage: python scripts/score/honesty_probe.py
+
+Result: the detector scored 51.8 on the stand-in vs 53.1 for the confidence rule (practice, out-of-fold: 62.9 vs 64.9),
+and PCA 4/8/16/64 x C 0.01/0.1 variants all stayed below the rule on the practice set too. Debussy keeps the rule.
 """
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))  # repo root on the path
