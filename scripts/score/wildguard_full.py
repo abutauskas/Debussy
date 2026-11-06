@@ -41,3 +41,11 @@ for k in H:
     print(f"  {names[k]:16s} F1 {f1s[k]:5.1f}   ({len(sub)} labelled rows, {y.mean() * 100:.0f}% positive)")
 print(f"  average           F1 {np.mean(list(f1s.values())):5.1f}")
 if len(rows) < 1725: print("  (partial: the run is not finished yet)")
+
+# Published full-WildGuardTest F1 ("Total" columns), WildGuard paper (Han et al., 2024, arXiv 2406.18495), Table 4.
+# WildGuard was trained on WildGuardMix's training split (as Debussy's heads were calibrated on 718 rows of it);
+# Llama-Guard2 and GPT-4 were not, so for them this test is out of distribution.
+PUBLISHED = {"WildGuard-7B": (88.9, 75.4, 88.6), "GPT-4": (87.9, 77.3, 92.4), "Llama-Guard2": (70.9, 66.5, 53.8)}
+print("\n  model            harmful request  harmful reply  refusal   (published, WildGuard paper Table 4)")
+print(f"  {'Debussy (' + P + ')':16s} {f1s['prompt_harm']:15.1f} {f1s['response_harm']:14.1f} {f1s['refusal']:8.1f}   (ours)")
+for m, (a_, b_, c_) in PUBLISHED.items(): print(f"  {m:16s} {a_:15.1f} {b_:14.1f} {c_:8.1f}")
