@@ -13,7 +13,7 @@ Every comparison below uses **identical training/calibration rows and identical 
 | Benchmark (25% each) | Qwen3.5-4B | K2-Horizon-7B | Test rows | Note |
 |---|---|---|---|---|
 | When2Call (model-only) | **94.0%** | 89.3% | 300 | Qwen with 799 training pairs, K2 with 500 (K2 did not improve from 200 → 500) |
-| WildGuardTest (avg F1) | 89.8 | **92.8** | 300 | both calibrated on the same 400 rows (150 balanced + 250 natural mix) |
+| WildGuardTest (avg F1) | 90.5 | **93.6** | 500 | both calibrated on the same 718 rows (468 balanced + 250 natural mix) |
 | HLE-MultiChoice | 10.5% | **13.6%** | all 513 | chance 16.4%; both below chance, K2 less so |
 | Omniscience stand-in | 51.8 | **53.1** | 266 | each with its own "I don't know" threshold from the practice set (Qwen 0.7, K2 0.9) |
 
@@ -21,16 +21,20 @@ Every comparison below uses **identical training/calibration rows and identical 
 
 | Debussy variant | When2Call | WildGuard | HLE | Omniscience | **Index** |
 |---|---|---|---|---|---|
-| Qwen3.5-4B (current default) | 93.2 (600 q) | 89.9 (880 rows) | 10.5 | 51.8 | **≈ 61.4** |
-| K2-Horizon-7B | 89.3 | 92.8 | 13.6 | 53.1 | **≈ 62.2** |
-| Two specialists: Qwen for tool calls, K2 for safety + knowledge | 93.2 | 92.8 | 13.6 | 53.1 | **≈ 63.2** |
+| Qwen3.5-4B (light default) | 93.2 (600 q) | 89.9 (880 rows) | 10.5 | 51.8 | **≈ 61.4** |
+| K2-Horizon-7B | 89.3 | 93.6 (500 rows) | 13.6 | 53.1 | **≈ 62.4** |
+| **Two specialists (recommended):** Qwen for tool calls, K2 for safety + knowledge | 93.2 | 93.6 | 13.6 | 53.1 | **≈ 63.4** |
 
 ## What we learned
 - **K2 is the better judge and the more honest knower; Qwen is the better tool-caller.** K2's raw safety judgements are
   clearly sharper (harmful reply 0.87 vs 0.80, refusal 0.86 vs 0.81, before calibration, 300 test rows); Qwen's tool-call instincts are better, and more
   training pairs did not close K2's gap.
 - **Calibration matters as much as the model.** With 150 calibration rows K2 merely tied Qwen on WildGuard (0.873 vs 0.871);
-  with the same natural-mix rows Qwen got, K2 pulled ahead (0.928 vs 0.898).
+  with the same natural-mix rows Qwen got, K2 pulled ahead (0.928 vs 0.898), and with all 718 calibration rows and
+  500 test rows, identical for both, the gap held (0.936 vs 0.905).
+- **Re-checking old results pays off.** K2's 150 oldest calibration rows differed from a fresh run by 0.2-0.3 log-odds
+  on average (no systematic shift; 2-3 of 60 yes/no answers flipped), most likely because they were saved before the
+  double-BOS fix. They were re-run; K2's score did not move (0.928 → 0.927 on the same 300 test rows).
 - **K2 is overconfident.** Its own "I don't know" threshold is 0.9 (Qwen: 0.7). With it, K2 answers only 9% of obscure
   questions and is honest on 98% of the rest.
 - **Reading K2's internal state did not beat its own confidence (a negative result).** We trained a small "honesty
@@ -57,8 +61,11 @@ export DEBUSSY_PROFILE=k2-horizon DEBUSSY_BACKEND=server
 python scripts/run/transfer_run.py hle                          # all 513
 python scripts/run/transfer_run.py omni_public && python scripts/run/transfer_run.py mmlu_proxy 400
 python scripts/run/transfer_run.py wg 150 300 && python scripts/run/transfer_run.py wg_natural 170 1 && python scripts/run/transfer_run.py wg_natural 80 2
+python scripts/run/transfer_run.py wg_more_cal 0 150 && python scripts/run/transfer_run.py wg_more_cal 150 468   # 0-150: fresh re-run
+python scripts/run/transfer_run.py wg_more_test 300 500
+python scripts/score/compare_bases.py wg --write                # 718 calibration + 500 test rows, identical for both models
+python scripts/score/wildguard.py data/k2-horizon/wg_all_718cal_500te.json --natural-weights --save --heads debussy/heads_k2-horizon.json
 python scripts/run/transfer_run.py w2c 100 150 && python scripts/run/transfer_run.py w2c_more_train 100 250 && python scripts/run/transfer_run.py w2c_more_test 150 300
-python scripts/score/compare_bases.py wg                        # identical rows for both models
 python scripts/checks/parity_check.py 5 k2-horizon server       # packaged Debussy = research pipeline, on K2
 python -m debussy.model duo                                     # the two-specialist variant (Qwen in-process + K2 server)
 ```

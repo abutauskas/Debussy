@@ -1,12 +1,13 @@
 <p align="center"><img src="brand/debussy-logo.svg" width="400" alt="Debussy logo"></p>
 
 A fast **System 1 decision model** for the [Artificial Analysis Decision Index](https://artificialanalysis.ai/methodology/decision-index),
-built on a 4-core CPU with no GPU and no API key. One small open model answers short yes/no questions in single passes
+built on a 4-core CPU with no GPU and no API key. Small open models answer short yes/no questions in single passes
 (no step-by-step reasoning), and tiny calibrated heads (`heads.json`) turn those answers into a probability for every
 option. When unsure, Debussy prefers an honest "I don't know" over a guess.
 
-**Estimated Decision Index ≈ 61.4** (When2Call 93.2 · WildGuardTest 0.899 · HLE 10.5 · Omniscience stand-in 51.8).
-This is our own estimate, not an official score. Details, methods and caveats: **[docs/RESULTS.md](docs/RESULTS.md)**.
+**Estimated Decision Index ≈ 63.4** with two specialists (`DebussyDuo`: Qwen3.5-4B for tool calls, K2-Horizon-7B for
+safety and knowledge): When2Call 93.2 · WildGuardTest 0.936 · HLE 13.6 · Omniscience stand-in 53.1. The light
+single-model default (`Debussy()`, Qwen3.5-4B only) is ≈ 61.4. These are our own estimates, not official scores. Details, methods and caveats: **[docs/RESULTS.md](docs/RESULTS.md)**.
 
 ## Use it
 ```bash
@@ -27,8 +28,8 @@ d.choice(question, options + ["I don't know"])   # abstains when it is not confi
 | Variant | Base model(s) | RAM | Estimated index |
 |---|---|---|---|
 | `Debussy()` (default) | Qwen3.5-4B, in-process | ~3 GB | ≈ 61.4 |
-| `Debussy(profile="k2-horizon", backend="server")` | K2-Horizon-7B with thinking off, via `llama-server` | ~6 GB | ≈ 62.2 |
-| `DebussyDuo()` | Qwen for tool calls, K2 for safety and knowledge | ~9 GB | ≈ 63.2 |
+| `Debussy(profile="k2-horizon", backend="server")` | K2-Horizon-7B with thinking off, via `llama-server` | ~6 GB | ≈ 62.4 |
+| **`DebussyDuo()`** (recommended) | Qwen for tool calls, K2 for safety and knowledge | ~9 GB | **≈ 63.4** |
 
 Every variant still makes each decision in a single pass. K2 needs a current llama.cpp build of `llama-server`
 (the pinned `llama-cpp-python` cannot load it). How it compares, and how to run it: **[docs/K2_EXPERIMENT.md](docs/K2_EXPERIMENT.md)**.
@@ -58,4 +59,4 @@ After the composer Claude Debussy: the logo is a *Clair de lune* crescent and an
 a nod to Debussy being built with help from Claude.
 
 Built by the project owner with help from Claude (Anthropic's AI assistant). Not an Anthropic model.
-Third-party licences: [NOTICE.md](NOTICE.md).
+Licence: [Apache-2.0](LICENSE). Third-party licences: [NOTICE.md](NOTICE.md).

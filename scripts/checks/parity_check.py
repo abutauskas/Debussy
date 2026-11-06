@@ -15,7 +15,7 @@ from debussy.skills.wildguard_rows import all_rows
 n = int(sys.argv[1]); profile = sys.argv[2] if len(sys.argv) > 2 else "qwen3.5"; backend = sys.argv[3] if len(sys.argv) > 3 else "inproc"
 d = Debussy(profile=profile, backend=backend); L = ["tool_call", "request_for_info", "cannot_answer"]
 REF = ({"w2c": "data/w2o2_4b_all_500tr.json", "wg": "data/wg_all_638tr.json"} if profile == "qwen3.5" else
-       {"w2c": f"data/{profile}/w2c_500tr_300te.json", "wg": f"data/{profile}/wg_all_400cal.json"})
+       {"w2c": f"data/{profile}/w2c_500tr_300te.json", "wg": f"data/{profile}/wg_all_718cal_500te.json"})
 T = [json.loads(l) for l in open("data/w2c_when2call_test_mcq.jsonl")]
 import random; random.Random(0).shuffle(T)
 ref = [r for r in json.load(open(REF["w2c"])) if r["split"] == "te"]
