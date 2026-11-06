@@ -8,6 +8,7 @@ usage (examples):
   ... python transfer_run.py wg 300 500                  # WildGuard: first 300 calibration rows, first 500 test rows
   ... python transfer_run.py wg_more_cal 150 468         # WildGuard calibration rows 150..467 of all_rows() (own file)
   ... python transfer_run.py wg_more_test 300 500        # WildGuard test rows 300..499 of all_rows() (own file)
+  ... python transfer_run.py hle_practice 600            # HLE-shaped MMLU-Pro practice set (letter-bias correction)
 Outputs go to data/<profile>/<skill>.json (resumable). Then score with the existing scripts, e.g.
   python hle_eval.py --score data/k2-horizon/hle.json
 """
@@ -54,6 +55,33 @@ def run_omni_public(e):
         pr = e.letter_probs(MC + x["q"] + "\n\n" + "\n".join(f"{L4[k]}. {o}" for k, o in enumerate(opts)), L4)
         return {"qid": x["qid"], "domain": x["domain"], "p": pr.round(5).tolist(), "ans": opts.index(x["answer"])}
     resumable("omni_public", items, f)
+
+
+def hle_practice_items(n=600, seed=11):
+    """Practice questions shaped like HLE-MultiChoice, from MMLU-Pro (never HLE): 5-10 options each (the correct one plus
+    random wrong ones, shuffled, so the correct letter is uniform), laid out as HLE does ("Answer Choices:\nA. ...").
+    Excludes the 400 questions of the Omniscience practice set (knowledge_proxy.build)."""
+    import pandas as pd
+    from debussy.skills.knowledge_proxy import build
+    used = {q["q"] for q in build(400)}
+    d = pd.read_parquet(os.path.join(HERE, "data/mmlupro_test.parquet"))
+    d = d[(d.options.apply(len) == 10) & ~d.question.isin(used)].sample(n, random_state=seed)
+    rnd = random.Random(seed); out = []
+    for _, r in d.iterrows():
+        k = rnd.randint(5, 10); opts = list(r["options"]); corr = opts[r["answer_index"]]
+        pick = rnd.sample([o for i, o in enumerate(opts) if i != r["answer_index"]], k - 1) + [corr]; rnd.shuffle(pick)
+        L = [chr(65 + i) for i in range(k)]
+        text = r["question"] + "\n\nAnswer Choices:\n" + "\n".join(f"{l}. {o}" for l, o in zip(L, pick))
+        out.append({"text": text, "letters": L, "ans": pick.index(corr), "cat": r["category"]})
+    return out
+
+
+def run_hle_practice(e, n=600):
+    """K2's letter probabilities on the HLE-shaped practice set (for the letter-bias correction; HLE is never used)."""
+    def f(q):
+        pr = e.letter_probs(MC + q["text"], q["letters"])
+        return {"p": pr.round(5).tolist(), "ans": q["ans"], "k": len(q["letters"]), "cat": q["cat"]}
+    resumable("hle_practice", hle_practice_items(n), f)
 
 
 def run_mmlu_proxy(e, n):
@@ -153,6 +181,7 @@ if __name__ == "__main__":
     {"hle": lambda: run_hle(e, *(args or [None])),"omni_public": lambda: run_omni_public(e), "mmlu_proxy": lambda: run_mmlu_proxy(e, *(args or [400])),
      "w2c": lambda: run_w2c(e, *(args or [200, 300])), "wg": lambda: run_wg(e, *(args or [300, 500])),
      "wg_natural": lambda: run_wg_natural(e, *(args or [170, 1])),
+     "hle_practice": lambda: run_hle_practice(e, *(args or [600])),
      "wg_more_cal": lambda: run_wg_range(e, "tr", *args), "wg_more_test": lambda: run_wg_range(e, "te", *args),
      "w2c_more_train": lambda: run_w2c_more_train(e, *(args or [100, 250])),
      "w2c_more_test": lambda: run_w2c_more_test(e, *(args or [150, 300]))}[skill]()
