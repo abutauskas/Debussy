@@ -50,6 +50,7 @@ experiments/             early attempts: embedding classifier, probes, CPU LoRA,
 docs/                    RESULTS.md (scores, methods, caveats) · TRANSFER.md (moving to a new base model)
                          · K2_EXPERIMENT.md (Qwen vs K2-Horizon, the two-specialist variant)
 brand/                   logo, wordmarks, exports; archive/ holds earlier logo versions
+hf/README.md             model card for Hugging Face (upload with the heads files and the logo)
 data/README.md           how to get the datasets (not stored here; some are gated)
 ```
 Scripts in `scripts/` run from anywhere; package modules run as `python -m debussy.skills.<name>` from the repository root.
