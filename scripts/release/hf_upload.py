@@ -2,6 +2,7 @@
 
 usage: python scripts/release/hf_upload.py [--repo debussylabs/debussy] [--dry-run]
        python scripts/release/hf_upload.py --org-card [--dry-run]   (the organisation page: Space debussylabs/README)
+       python scripts/release/hf_upload.py --demo [--dry-run]       (the demo: Space debussylabs/debussy-demo)
 Needs a Hugging Face token with write access to the organisation, in HF_TOKEN (in a Claude cloud session the network
 proxy injects the saved token, so HF_TOKEN can be any placeholder). Creates the repo (public) if it doesn't exist and
 uploads everything in one commit named after the package version. No model weights are uploaded: the card links to
@@ -26,19 +27,27 @@ ORG_CARD = {  # Hugging Face shows an organisation's README from its Space named
     "debussy-labs-banner.png": "brand/debussy-labs-banner.png",
 }
 
+DEMO = {  # the Gradio demo ships with the released Debussy code and heads; the base model is downloaded at start-up
+    "README.md": "hf/space/README.md", "app.py": "hf/space/app.py", "requirements.txt": "hf/space/requirements.txt",
+    **{f"debussy/{f}": f"debussy/{f}" for f in ["__init__.py", "model.py", "engine.py", "paths.py", "heads.json", "heads_k2-horizon.json"]},
+    **{f"debussy/skills/{f}": f"debussy/skills/{f}" for f in ["__init__.py", "when2call.py", "wildguard.py"]},
+}
+
 if __name__ == "__main__":
-    org = "--org-card" in sys.argv
+    org = "--org-card" in sys.argv; demo = "--demo" in sys.argv
     if org: FILES = ORG_CARD
-    repo = "debussylabs/README" if org else (sys.argv[sys.argv.index("--repo") + 1] if "--repo" in sys.argv else "debussylabs/debussy")
+    if demo: FILES = DEMO
+    repo = "debussylabs/debussy-demo" if demo else "debussylabs/README" if org else (sys.argv[sys.argv.index("--repo") + 1] if "--repo" in sys.argv else "debussylabs/debussy")
     from debussy import __version__
     for dst, src in FILES.items():
         print(f"  {src:32s} -> {repo}/{dst}  ({os.path.getsize(os.path.join(ROOT, src)):,} bytes)")
     if "--dry-run" in sys.argv: sys.exit(0)
     from huggingface_hub import CommitOperationAdd, HfApi
     api = HfApi(token=os.environ.get("HF_TOKEN") or "proxy-injected")
-    kind = "space" if org else "model"
-    url = api.create_repo(repo, repo_type=kind, private=False, exist_ok=True, **({"space_sdk": "static"} if org else {}))
-    info = api.create_commit(repo, repo_type=kind, commit_message=("Organisation card" if org else f"Debussy {__version__}"),
-                             commit_description=("README, landing page and logo." if org else "Model card, calibrated heads, logo, licence, notices and changelog."),
+    kind = "space" if (org or demo) else "model"
+    sdk = {"space_sdk": "static"} if org else {"space_sdk": "gradio"} if demo else {}
+    url = api.create_repo(repo, repo_type=kind, private=False, exist_ok=True, **sdk)
+    info = api.create_commit(repo, repo_type=kind, commit_message=("Organisation card" if org else f"Debussy {__version__} demo" if demo else f"Debussy {__version__}"),
+                             commit_description=("README, landing page and logo." if org else "Gradio app with the released Debussy package." if demo else "Model card, calibrated heads, logo, licence, notices and changelog."),
                              operations=[CommitOperationAdd(dst, os.path.join(ROOT, src)) for dst, src in FILES.items()])
     print("repo:", url, "\ncommit:", info.commit_url)
