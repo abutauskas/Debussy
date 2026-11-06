@@ -9,11 +9,13 @@ probability for every option (or P(yes) for yes/no questions) - no free-form rea
     from debussy import Debussy
     d = Debussy()                                   # Qwen3.5-4B in-process + heads.json
     d = Debussy(profile="k2-horizon", backend="server")   # K2-Horizon via a running llama-server + heads_k2-horizon.json
+    d = DebussyDuo()                                # Qwen for When2Call, K2 (server) for WildGuard and choice
     d.when2call(tools, user_msg, candidates)        # -> {"direct":p, "tool_call":p, "request_for_info":p, "cannot_answer":p}
     d.wildguard(prompt, response)                   # -> {"prompt_harm":p, "refusal":p, "response_harm":p}
     d.choice(question, options, idk_option=None)    # -> {option: p, ...}  (abstains via idk_option when unsure)
 
-CLI demo: python -m debussy.model [profile] [backend]
+CLI demo: python -m debussy.model [profile] [backend]      e.g. python -m debussy.model k2-horizon server
+          python -m debussy.model duo                     (Qwen in-process + K2 via llama-server)
 """
 import json, os, sys
 import numpy as np
@@ -127,7 +129,7 @@ class DebussyDuo:
 Decider = Debussy  # backwards-compatible alias
 
 if __name__ == "__main__":
-    d = Debussy(*(sys.argv[1:3]))
+    d = DebussyDuo() if sys.argv[1:2] == ["duo"] else Debussy(*(sys.argv[1:3]))
     tools = [{"name": "Flights_4_SearchOnewayFlight", "description": "Search one-way flights.",
               "parameters": {"type": "dict", "required": ["origin_airport", "destination_airport", "departure_date"],
                              "properties": {"origin_airport": {"type": "string"}, "destination_airport": {"type": "string"},

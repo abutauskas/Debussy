@@ -23,8 +23,10 @@ leaderboard changes over time.
 **Index estimate:** 0.25 × (93.2 + 89.9 + 10.5 + 51.8) ≈ **61.4**. For comparison, Artificial Analysis's launch article
 lists the best decision model at 58 and Claude Haiku 5.5 (Low) at 61; a later snapshot shows ~65 at the top. This is
 an **estimate, not a measured leaderboard score**: Artificial Analysis runs its own harness, and the Omniscience
-questions are private. This is an
-**estimate, not a measured leaderboard score**. See the caveats below.
+questions are private. See the caveats below.
+
+These are the numbers for the default Debussy (Qwen3.5-4B). The same skills on K2-Horizon-7B, and a two-specialist
+variant that uses both models (≈ 63.2), are compared on identical rows in **[K2_EXPERIMENT.md](K2_EXPERIMENT.md)**.
 
 ## How each part works
 

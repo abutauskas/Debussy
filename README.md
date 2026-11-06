@@ -25,12 +25,22 @@ d.wildguard(user_prompt, assistant_reply)        # -> P(harmful request), P(refu
 d.choice(question, options + ["I don't know"])   # abstains when it is not confident
 ```
 
+### Variants
+| Variant | Base model(s) | RAM | Estimated index |
+|---|---|---|---|
+| `Debussy()` (default) | Qwen3.5-4B, in-process | ~3 GB | ≈ 61.4 |
+| `Debussy(profile="k2-horizon", backend="server")` | K2-Horizon-7B with thinking off, via `llama-server` | ~6 GB | ≈ 62.2 |
+| `DebussyDuo()` | Qwen for tool calls, K2 for safety and knowledge | ~9 GB | ≈ 63.2 |
+
+Every variant still makes each decision in a single pass. K2 needs a current llama.cpp build of `llama-server`
+(the pinned `llama-cpp-python` cannot load it). How it compares, and how to run it: **[docs/K2_EXPERIMENT.md](docs/K2_EXPERIMENT.md)**.
+
 ## Layout
 ```
 debussy/                 the model (Python package)
-  model.py                 Debussy class: when2call(), wildguard(), choice()
+  model.py                 Debussy and DebussyDuo: when2call(), wildguard(), choice()
   engine.py                model-agnostic core: base-model profiles + backends (see docs/TRANSFER.md)
-  heads.json               trained head weights and thresholds (tiny)
+  heads.json               trained head weights and thresholds (tiny); heads_k2-horizon.json for K2
   paths.py                 where data/, models/ and heads.json live
   skills/                  when2call · wildguard · wildguard_rows · hle · omniscience · knowledge_proxy · retrieval
 scripts/
@@ -39,6 +49,7 @@ scripts/
   checks/                  parity_check.py (package = pipeline), engine_check.py (engine = saved results)
 experiments/             early attempts: embedding classifier, probes, CPU LoRA, decomposed checks
 docs/                    RESULTS.md (scores, methods, caveats) · TRANSFER.md (moving to a new base model)
+                         · K2_EXPERIMENT.md (Qwen vs K2-Horizon, the two-specialist variant)
 brand/                   logo, wordmarks, exports; archive/ holds earlier logo versions
 data/README.md           how to get the datasets (not stored here; some are gated)
 ```
