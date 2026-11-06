@@ -23,6 +23,7 @@ FILES = {  # path in the Hugging Face repo -> path here
 
 ORG_CARD = {  # Hugging Face shows an organisation's README from its Space named "README"
     "README.md": "hf/org/README.md", "index.html": "hf/org/index.html", "debussy-avatar.png": "brand/debussy-avatar-square-512.png",
+    "debussy-labs-banner.png": "brand/debussy-labs-banner.png",
 }
 
 if __name__ == "__main__":
