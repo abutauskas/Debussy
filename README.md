@@ -57,6 +57,7 @@ functions/               Cloudflare Pages Functions: GitHub sign-in, API keys, t
 cloudflare/              database schema, shared helpers, local test harness
 data/README.md           how to get the datasets (not stored here; some are gated)
 CHANGELOG.md             release notes (also on debussylabs.com/releases and GitHub Releases)
+.github/workflows/        release.yml: one-click releases (docs/RELEASING.md)
 ```
 Scripts in `scripts/` run from anywhere; package modules run as `python -m debussy.skills.<name>` from the repository root.
 

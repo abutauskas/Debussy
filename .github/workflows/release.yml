@@ -1,0 +1,64 @@
+# Releases, the same way every time.
+#   Option A (recommended): Actions -> Release -> Run workflow -> type the version (e.g. 0.1.1).
+#     Checks that debussy/__init__.py, CHANGELOG.md and the Releases page agree, then creates the tag and the release
+#     (notes from CHANGELOG.md) and attaches debussy-<version>-heads.zip. Re-running it for an existing release
+#     refreshes its notes and files.
+#   Option B: publish a release by hand on GitHub; this workflow then attaches the zip to it automatically.
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release, without the v (e.g. 0.1.1). Update CHANGELOG.md, debussy/__init__.py and the Releases page first."
+        required: true
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Work out the version
+        id: v
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          EVENT: ${{ github.event_name }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          if [ "$EVENT" = "release" ]; then V="${TAG#v}"; else V="$INPUT_VERSION"; fi
+          printf 'version=%s\n' "$V" >> "$GITHUB_OUTPUT"
+
+      - name: Check version, CHANGELOG and Releases page agree
+        env:
+          V: ${{ steps.v.outputs.version }}
+        run: python3 scripts/release/check.py "$V"
+
+      - name: Build the release files
+        env:
+          V: ${{ steps.v.outputs.version }}
+        run: python3 scripts/release/build.py "$V"
+
+      - name: Create or update the release
+        env:
+          V: ${{ steps.v.outputs.version }}
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            if gh release view "v$V" >/dev/null 2>&1; then
+              gh release edit "v$V" --title "Debussy $V" --notes-file dist/notes.md
+            else
+              gh release create "v$V" --target "$GITHUB_SHA" --title "Debussy $V" --notes-file dist/notes.md --latest
+            fi
+          fi
+          gh release upload "v$V" "dist/debussy-$V-heads.zip" --clobber
