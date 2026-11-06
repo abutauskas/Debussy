@@ -37,7 +37,8 @@ if __name__ == "__main__":
     org = "--org-card" in sys.argv; demo = "--demo" in sys.argv
     if org: FILES = ORG_CARD
     if demo: FILES = DEMO
-    repo = "debussylabs/debussy-demo" if demo else "debussylabs/README" if org else (sys.argv[sys.argv.index("--repo") + 1] if "--repo" in sys.argv else "debussylabs/debussy")
+    default = "debussylabs/debussy-demo" if demo else "debussylabs/README" if org else "debussylabs/debussy"
+    repo = sys.argv[sys.argv.index("--repo") + 1] if "--repo" in sys.argv else default   # e.g. --demo --repo K00lKidd/debussy-demo
     from debussy import __version__
     for dst, src in FILES.items():
         print(f"  {src:32s} -> {repo}/{dst}  ({os.path.getsize(os.path.join(ROOT, src)):,} bytes)")
