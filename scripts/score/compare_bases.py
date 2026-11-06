@@ -28,6 +28,12 @@ def extend(rows, split):
 
 
 if which == "wg":
+    # the first 150 calibration rows in wg.json differ from a fresh re-run (by ~0.4 log-odds on the 2 we checked; most
+    # likely saved before the double-BOS fix), so use the re-run (transfer_run.py wg_more_cal 0 150) once it is complete.
+    # The test rows match a fresh run exactly (parity check: 0.0000).
+    fresh = f"data/k2-horizon/wg_tr_0_{len(ktr)}.json"
+    if os.path.exists(fresh) and len(json.load(open(fresh))) == len(ktr):
+        ktr = json.load(open(fresh)); print(f"using re-run calibration rows {fresh}")
     ktr = extend(ktr, "tr"); kte = extend(kte, "te")
     Q = json.load(open("data/wg_all_718tr_880te.json"))   # train order: same rows as all_rows() first; test: same order
     qtr = [r for r in Q if r["split"] == "tr"][:len(ktr)]; qte = [r for r in Q if r["split"] == "te"][:len(kte)]
