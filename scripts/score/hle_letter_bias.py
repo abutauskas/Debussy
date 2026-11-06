@@ -11,7 +11,7 @@ Selection, fixed in advance: nested 5-fold CV accuracy on the practice set (pick
 folds never seen); a correction is used only if the selection procedure beats "none" there. HLE is only read for the
 final before/after line. Questions with more than 10 options (not covered by the practice set) are left unchanged.
 
-usage: python scripts/score/hle_letter_bias.py [--save --heads debussy/heads_k2-horizon.json]
+usage: python scripts/score/hle_letter_bias.py [--profile k2-horizon] [--save --heads debussy/heads_k2-horizon.json]
        (--save stores the chosen correction in the heads file, only if the rule says to use one)
 
 Result: K2 leans towards B and away from the last option (E 0.12 vs 0.20 on 5-option questions). Nested CV on the
@@ -26,7 +26,7 @@ from sklearn.model_selection import KFold
 from debussy.paths import DATA
 
 KMAX, NEG = 10, -1e9
-K2 = os.path.join(DATA, "k2-horizon")
+K2 = os.path.join(DATA, sys.argv[sys.argv.index("--profile") + 1] if "--profile" in sys.argv else "k2-horizon")
 
 
 def pad(rows):
