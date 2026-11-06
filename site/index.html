@@ -226,7 +226,7 @@
     <ul class="ledger">
       <li><b>Estimates, not official scores</b><span>Every number here is our own measurement. We'd welcome an independent evaluation.</span></li>
       <li><b>Below chance on HLE</b><span>13.6% against 16.4% chance. A System 1 model does not solve these questions, and we don't pretend it does.</span></li>
-      <li><b>A probe that didn't beat plain confidence</b><span>Reading K2-Horizon's internal state to predict right answers scored 51.8 against 53.1 for its own confidence. We kept the simple rule.</span></li>
+      <li><b>Two probes that didn't beat simpler rules</b><span>Reading K2-Horizon's internal state lost to its plain confidence on knowledge (51.8 vs 53.1) and to the calibrated heads on safety (0.927 vs 0.936). We kept the simple versions.</span></li>
       <li><b>Our own check caught us</b><span>On random noise, the best of 12 probe settings still “won” plain cross-validation. We now judge every new idea with nested cross-validation.</span></li>
       <li><b>Stale data, re-run</b><span>An old batch of calibration rows didn't match a fresh run (most likely it was saved before a bug fix). We re-ran it and re-fitted; the score did not move.</span></li>
       <li><b>Slow on small CPUs</b><span>About 13 s per safety judgement on the 4-core machine it was built on. GPU and laptop numbers are next.</span></li>
