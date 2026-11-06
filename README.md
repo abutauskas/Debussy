@@ -1,4 +1,4 @@
-<p align="center"><img src="brand/debussy-logo.svg" width="96" alt="Debussy logo"></p>
+<p align="center"><img src="brand/debussy-logo.svg" width="400" alt="Debussy logo"></p>
 
 A fast **System 1 decision model** for the [Artificial Analysis Decision Index](https://artificialanalysis.ai/methodology/decision-index),
 built on a 4-core CPU with no GPU and no API key. One small open model answers short yes/no questions in single passes
