@@ -28,6 +28,12 @@ PROFILES = {
         "assistant_start": "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
         "bos": "",
     },
+    "qwen3.5-2b": {  # Debussy Mini: half the size of Qwen3.5-4B, same chat format
+        "model": "models/Qwen3.5-2B-Q4_K_M.gguf",
+        "user_start": "<|im_start|>user\n",
+        "assistant_start": "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+        "bos": "",
+    },
     "k2-horizon": {
         "model": "models/K2-Horizon-7B-Q4_K_M.gguf",
         "user_start": "<|ifm|im_start|>user\n",
@@ -169,4 +175,4 @@ def get_engine(**kw):
     return Engine(profile=kw.get("profile", os.environ.get("DEBUSSY_PROFILE", "qwen3.5")),
                   backend=kw.get("backend", os.environ.get("DEBUSSY_BACKEND", "inproc")),
                   model=kw.get("model", os.environ.get("DEBUSSY_MODEL")), server=kw.get("server"),
-                  n_ctx=kw.get("n_ctx", 4096))
+                  n_ctx=kw.get("n_ctx", int(os.environ.get("DEBUSSY_NCTX", "4096"))))   # in-process context size

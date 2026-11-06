@@ -28,8 +28,10 @@ MC = "Answer the multiple-choice question with the letter of the correct option.
 def resumable(name, items, fn, every=20):
     out = os.path.join(OUTDIR, name + ".json")
     rows = json.load(open(out)) if os.path.exists(out) else []
-    t0 = time.time(); s0 = len(rows)
+    t0 = time.time(); s0 = len(rows); deadline = float(os.environ.get("DEADLINE", "inf"))  # unix seconds (bounded sessions)
     for i in range(s0, len(items)):
+        if time.time() > deadline - 90:
+            json.dump(rows, open(out, "w")); print(f"STOPPED at deadline: {name} {len(rows)}/{len(items)} saved", flush=True); sys.exit(0)
         rows.append(fn(items[i]))
         if (i + 1) % every == 0 or i + 1 == len(items):
             json.dump(rows, open(out, "w")); print(f"{name} {i+1}/{len(items)} {(time.time()-t0)/(i+1-s0):.1f}s/item", flush=True)
