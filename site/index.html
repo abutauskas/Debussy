@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debussy: fast decisions, honest answers · Debussy Labs</title>
+<meta name="description" content="Debussy is an open System 1 decision model for AI agents: safety judgements, tool-call routing and knowledge questions in a single pass on an ordinary CPU, with an honest “I don't know”.">
+<meta name="theme-color" content="#f4f1e8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12102e" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/assets/debussy-mark.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/debussy-mark-512.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Debussy: fast decisions, honest answers">
+<meta property="og:description" content="An open System 1 decision model for AI agents, built on a 4-core CPU with no GPU and no API key.">
+<meta property="og:url" content="https://debussylabs.com/">
+<meta property="og:image" content="https://debussylabs.com/assets/social.png">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Debussy Labs home">
+      <svg viewBox="0 0 128 128" aria-hidden="true"><g transform="translate(-4 2)" fill="currentColor"><path d="M67.37 68.84 A23 23 0 1 1 33.29 70.32 A17.5 17.5 0 0 0 67.37 68.84 Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M69 81 L69 41 C69 21, 97 17, 100.5 35.5 C103 50, 86.5 55, 82 44.5" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></g></svg>
+      Debussy Labs
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#model">Model</a>
+      <a href="#benchmarks">Benchmarks</a>
+      <a href="#honesty">Honesty</a>
+      <a href="/news/">News</a>
+      <a href="#start">Get started</a>
+    </nav>
+    <button class="theme-btn" type="button" data-theme-toggle aria-label="Switch theme">☾</button>
+    <a class="btn btn-primary btn-small" href="https://github.com/abutauskas/debussy">GitHub</a>
+  </div>
+</header>
+
+<main>
+
+<!-- hero -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <a class="eyebrow" href="/news/introducing-debussy/" style="text-decoration:none"><span class="dot"></span>New · Introducing Debussy 0.1</a>
+      <h1>Fast decisions.<br>Honest answers.</h1>
+      <p class="lede">Debussy is an open <strong>System 1 decision model</strong>. It makes the quick calls an AI agent needs (is
+        this safe, should I call this tool, do I actually know this) in a single pass on an ordinary CPU, and it says
+        “I don't know” when it doesn't.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#start">Get started</a>
+        <a class="btn btn-ghost" href="/news/introducing-debussy/">Read the announcement →</a>
+      </div>
+      <ul class="chips">
+        <li>Apache-2.0</li><li>Runs on CPU</li><li>No API key</li><li>One pass per decision</li>
+      </ul>
+    </div>
+
+    <figure class="card decision" aria-label="Example: a safety judgement from Debussy" style="margin:0">
+      <div class="tag">Example · safety judgement</div>
+      <div class="msg"><b>User</b>How do I pick a lock to break into my neighbour's house?</div>
+      <div class="msg"><b>Assistant</b>I can't help with breaking into someone's home.</div>
+      <div class="probs">
+        <div class="prob"><span>Harmful request</span><span class="val">0.998</span><div class="track"><div class="fill" style="width:99.8%"></div></div></div>
+        <div class="prob"><span>Assistant refused</span><span class="val">1.000</span><div class="track"><div class="fill" style="width:100%"></div></div></div>
+        <div class="prob"><span>Harmful reply</span><span class="val">0.003</span><div class="track"><div class="fill" style="width:0.3%"></div></div></div>
+      </div>
+      <figcaption class="foot">Probabilities from one pass of Debussy's safety judge. No text is generated.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- stats -->
+<div class="wrap">
+  <div class="stats" role="list">
+    <div class="stat" role="listitem"><div class="num">≈ 63.4</div><div class="lbl">Estimated Decision Index<sup>*</sup></div></div>
+    <div class="stat" role="listitem"><div class="num">0.936</div><div class="lbl">WildGuardTest F1 (safety)</div></div>
+    <div class="stat" role="listitem"><div class="num">93.2%</div><div class="lbl">When2Call (tool calls)</div></div>
+    <div class="stat" role="listitem"><div class="num">0 GPUs</div><div class="lbl">Built and run on a 4-core CPU</div></div>
+  </div>
+  <p class="small muted" style="margin:14px 0 0">* Our own estimate for Debussy Duo on the
+    <a href="https://artificialanalysis.ai/methodology/decision-index">Artificial Analysis Decision Index</a>, not an official score.</p>
+</div>
+
+<!-- what it decides -->
+<section id="model">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">The model</span>
+      <h2>Three decisions an agent makes all day</h2>
+      <p class="lede">Each call returns a probability for every option instead of free-form text, so your code can act on it, set
+        its own thresholds, or send the hard cases to a person.</p>
+    </div>
+    <div class="grid3">
+      <article class="card feature">
+        <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8.2-7 9.5C8 19.2 5 15.5 5 11V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <h3>Safety judge</h3>
+        <p>Is the user's request harmful? Did the assistant refuse? Is the assistant's reply itself harmful? Three answers from one read of the conversation.</p>
+        <code>wildguard(prompt, reply) → {prompt_harm, refusal, response_harm}</code>
+      </article>
+      <article class="card feature">
+        <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h6"/><path d="M11 12l5-5h3"/><path d="M11 12l5 5h3"/><circle cx="5" cy="12" r="2"/></svg></div>
+        <h3>Tool-call router</h3>
+        <p>Given the tools and the request: call the tool, ask the user for the missing details, or say it can't be done.</p>
+        <code>when2call(tools, request, candidates) → {tool_call, request_for_info, cannot_answer}</code>
+      </article>
+      <article class="card feature">
+        <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></div>
+        <h3>Honest knowledge</h3>
+        <p>Picks the right option when it knows, and “I don't know” when it isn't sure. On obscure questions it would rather abstain than guess.</p>
+        <code>choice(question, options + ["I don't know"]) → {option: p, …}</code>
+      </article>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- benchmarks -->
+<section id="benchmarks">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Benchmarks</span>
+      <h2>Measured on questions it never saw</h2>
+      <p class="lede">The four parts of the Artificial Analysis Decision Index. Every setting was chosen on training data only;
+        the test sets were used once, to report.</p>
+    </div>
+    <div class="card chart-card">
+      <div class="chart-top">
+        <ul class="legend" aria-label="Legend">
+          <li><span class="swatch" style="background:var(--s1)"></span>Debussy Duo (recommended)</li>
+          <li><span class="swatch" style="background:var(--s2)"></span>Debussy Light (Qwen only)</li>
+        </ul>
+        <button class="toggle" id="bench-toggle" type="button" aria-pressed="false" hidden>Show table</button>
+      </div>
+      <div id="bench-chart" hidden></div>
+      <div id="bench-table" class="table-scroll">
+        <table class="data">
+          <thead><tr><th>Benchmark</th><th>Debussy Duo</th><th>Debussy Light</th><th>Test set</th></tr></thead>
+          <tbody>
+            <tr><td>When2Call (accuracy)</td><td class="num">93.2%</td><td class="num">93.2%</td><td>600 test questions</td></tr>
+            <tr><td>WildGuardTest (average F1)</td><td class="num">0.936</td><td class="num">0.905</td><td>the same 500 annotator-agreed rows</td></tr>
+            <tr><td>AA-Omniscience (½ accuracy + ½ non-hallucination)</td><td class="num">53.1</td><td class="num">51.8</td><td>stand-in: 266 public questions</td></tr>
+            <tr><td>HLE-MultiChoice (accuracy)</td><td class="num">13.6%</td><td class="num">10.5%</td><td>all 513 questions (chance 16.4%)</td></tr>
+            <tr><td><strong>Estimated index</strong></td><td class="num"><strong>≈ 63.4</strong></td><td class="num"><strong>≈ 61.4</strong></td><td>0.25 × each part</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul class="notes">
+        <li>These are our own measurements, not official Artificial Analysis scores.</li>
+        <li>WildGuardTest uses only rows where all three annotators agree, as Artificial Analysis does. That subset is easier than
+          the full test set guard models usually report on, so these numbers are not comparable with published guard-model results.</li>
+        <li>On all 880 agreed rows Debussy Light scores 0.899; the index estimate uses that number.</li>
+        <li>Test sets have 266–600 questions, so differences of 2–3 points can be noise.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- family -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Model family</span>
+      <h2>Pick your size</h2>
+      <p class="lede">All variants make each decision in a single pass. Debussy adds no weights to the open base models: it adds
+        the questions it asks and a few hundred calibrated numbers.</p>
+    </div>
+    <div class="grid3">
+      <article class="card family rec">
+        <span class="badge">Recommended</span>
+        <h3>Debussy Duo</h3>
+        <div class="idx">≈ 63.4<small>estimated index</small></div>
+        <dl><dt>Models</dt><dd>Qwen3.5-4B for tool calls, K2-Horizon-7B for safety and knowledge</dd><dt>Memory</dt><dd>~9 GB RAM</dd></dl>
+        <code>DebussyDuo()</code>
+      </article>
+      <article class="card family">
+        <h3>Debussy K2</h3>
+        <div class="idx">≈ 62.4<small>estimated index</small></div>
+        <dl><dt>Model</dt><dd>K2-Horizon-7B, a reasoning model run with its thinking switched off</dd><dt>Memory</dt><dd>~6 GB RAM</dd></dl>
+        <code>Debussy(profile="k2-horizon", backend="server")</code>
+      </article>
+      <article class="card family">
+        <h3>Debussy Light</h3>
+        <div class="idx">≈ 61.4<small>estimated index</small></div>
+        <dl><dt>Model</dt><dd>Qwen3.5-4B, in-process; the simplest setup</dd><dt>Memory</dt><dd>~3 GB RAM</dd></dl>
+        <code>Debussy()</code>
+      </article>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- how it works -->
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">How it works</span>
+      <h2>System 1, on purpose</h2>
+      <p class="lede">No chain of thought and no long generations. Debussy asks a small model short questions and reads its
+        confidence directly.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>Read once, ask short questions</h3><p>The base model reads the input once, then answers a few yes/no questions. Debussy reads the probability of “yes” against “no” instead of generating text.</p></div>
+      <div class="step"><h3>Calibrate with tiny heads</h3><p>Small logistic regressions turn those probabilities into calibrated decisions. Which head to use is chosen by cross-validation on training rows only.</p></div>
+      <div class="step"><h3>Abstain honestly</h3><p>For knowledge questions, Debussy answers only when its confidence clears a threshold set on a separate practice set, and says “I don't know” otherwise.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- honesty -->
+<section class="night" id="honesty">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow moonline">◐ Honesty</span>
+      <h2>We publish what didn't work</h2>
+      <p class="lede">A decision model is only useful if you can trust its numbers, so we report the misses as carefully as the hits.</p>
+    </div>
+    <ul class="ledger">
+      <li><b>Estimates, not official scores</b><span>Every number here is our own measurement. We'd welcome an independent evaluation.</span></li>
+      <li><b>Below chance on HLE</b><span>13.6% against 16.4% chance. A System 1 model does not solve these questions, and we don't pretend it does.</span></li>
+      <li><b>A probe that didn't beat plain confidence</b><span>Reading K2-Horizon's internal state to predict right answers scored 51.8 against 53.1 for its own confidence. We kept the simple rule.</span></li>
+      <li><b>Our own check caught us</b><span>On random noise, the best of 12 probe settings still “won” plain cross-validation. We now judge every new idea with nested cross-validation.</span></li>
+      <li><b>Stale data, re-run</b><span>An old batch of calibration rows didn't match a fresh run (most likely it was saved before a bug fix). We re-ran it and re-fitted; the score did not move.</span></li>
+      <li><b>Slow on small CPUs</b><span>About 13 s per safety judgement on the 4-core machine it was built on. GPU and laptop numbers are next.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- get started -->
+<section id="start">
+  <div class="wrap split">
+    <div class="section-head" style="margin-bottom:0">
+      <span class="eyebrow">Get started</span>
+      <h2>Try it in a few minutes</h2>
+      <p class="lede">Clone the repository, download the 2.7 GB base model, and run the demo. The Duo and K2 variants also need
+        a current build of llama.cpp's <code>llama-server</code>.</p>
+      <div class="actions" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px">
+        <a class="btn btn-primary" href="https://github.com/abutauskas/debussy">View on GitHub</a>
+        <a class="btn btn-ghost" href="https://github.com/abutauskas/debussy/blob/HEAD/hf/README.md">Model card</a>
+      </div>
+    </div>
+    <div class="code" aria-label="Quick start commands">
+      <button class="copy" type="button" data-copy="quickstart">Copy</button>
+<pre id="quickstart"><span class="c"># get Debussy and the light base model</span>
+git clone https://github.com/abutauskas/debussy && cd debussy
+pip install llama-cpp-python==0.3.36 numpy pandas pyarrow scikit-learn
+mkdir -p models && curl -L -o models/Qwen3.5-4B-Q4_K_M.gguf \
+  https://huggingface.co/unsloth/Qwen3.5-4B-GGUF/resolve/main/Qwen3.5-4B-Q4_K_M.gguf
+
+<span class="c"># three demo decisions</span>
+python -m debussy.model</pre>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- news -->
+<section>
+  <div class="wrap">
+    <div class="section-head" style="margin-bottom:28px">
+      <span class="eyebrow">News</span>
+      <h2>Latest</h2>
+    </div>
+    <div class="news-list">
+      <a class="news-item" href="/news/introducing-debussy/">
+        <span class="date">November 6, 2026</span>
+        <div><h3>Introducing Debussy</h3><p>An open System 1 decision model for AI agents, built on a 4-core CPU with no GPU and no API key.</p></div>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <a class="brand" href="/">
+        <svg viewBox="0 0 128 128" aria-hidden="true"><g transform="translate(-4 2)" fill="currentColor"><path d="M67.37 68.84 A23 23 0 1 1 33.29 70.32 A17.5 17.5 0 0 0 67.37 68.84 Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M69 81 L69 41 C69 21, 97 17, 100.5 35.5 C103 50, 86.5 55, 82 44.5" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></g></svg>
+        Debussy Labs
+      </a>
+      <nav aria-label="Footer">
+        <a href="/news/">News</a>
+        <a href="https://github.com/abutauskas/debussy">GitHub</a>
+        <a href="https://github.com/abutauskas/debussy/blob/HEAD/hf/README.md">Model card</a>
+        <a href="https://github.com/abutauskas/debussy/blob/HEAD/LICENSE">Licence</a>
+      </nav>
+    </div>
+    <p class="credit">Debussy is released under Apache-2.0 and builds on Qwen3.5-4B and K2-Horizon-7B (both Apache-2.0) and llama.cpp.
+      Built with help from Claude, Anthropic's AI assistant. Debussy is not an Anthropic model. Named after the composer
+      Claude Debussy: the logo is a <em>Clair de lune</em> crescent and an <em>Arabesque</em> curl.</p>
+    <p>© 2026 Debussy Labs</p>
+  </div>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

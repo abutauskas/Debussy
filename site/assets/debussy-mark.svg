@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="Debussy">
+  <!-- Debussy: an "arabesque note". A crescent-moon note head (Clair de lune) whose horn flows into the stem,
+       and the stem curls into an arabesque (Deux Arabesques). Also reads as a lowercase "d". -->
+  <g transform="translate(-4 2)" fill="#4536C9">
+    <path d="M67.37 68.84 A23 23 0 1 1 33.29 70.32 A17.5 17.5 0 0 0 67.37 68.84 Z" stroke="#4536C9" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M69 81 L69 41 C69 21, 97 17, 100.5 35.5 C103 50, 86.5 55, 82 44.5" fill="none" stroke="#4536C9" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
