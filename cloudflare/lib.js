@@ -70,3 +70,6 @@ export function siteOrigin(env, request) {
   if (["127.0.0.1", "localhost"].includes(host)) return new URL(request.url).origin;   // local testing
   return new URL((env && env.SITE_URL) || "https://debussylabs.com").origin;
 }
+
+/** Sign-ups stay closed unless SIGNUPS_OPEN is exactly "true" (a deliberate switch, separate from the setup). */
+export const signupsOpen = (env) => Boolean(env && env.SIGNUPS_OPEN === "true" && env.DB && env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET);

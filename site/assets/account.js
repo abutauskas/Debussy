@@ -16,12 +16,16 @@
   // ---- sign-in page --------------------------------------------------------------------------
   if ($("#login")) {
     var ERR = { state: "The sign-in expired or was interrupted. Please try again.", github: "GitHub didn't confirm the sign-in. Please try again.",
-                blocked: "This account can't sign in.", unavailable: "Sign-in isn't open yet.", account: "We couldn't create your account. Please try again." };
+                blocked: "This account can't sign in.", unavailable: "Sign-in isn't open yet.", closed: "Sign-ups aren't open yet.",
+                account: "We couldn't create your account. Please try again." };
     var code = new URLSearchParams(location.search).get("error");
     if (code) { var n = $("#login-error"); n.hidden = false; n.textContent = ERR[code] || "Sign-in didn't work. Please try again."; }
-    api("/api/me").then(function (r) {
-      if (r.status === 200) location.replace("/dashboard/");
-      else if (r.status !== 401) { $("#login-closed").hidden = false; }
+    api("/api/me").then(function (r) { if (r.status === 200) location.replace("/dashboard/"); });
+    api("/api/status").then(function (r) {   // the page says "coming soon" unless sign-ups are switched on
+      if (!(r.status === 200 && r.body && r.body.signups_open)) return;
+      $("#login-title").textContent = "Sign in";
+      $("#login-lede").textContent = "Use your GitHub account. Signing in for the first time creates your Debussy Labs account.";
+      $("#selfhost-btn").hidden = true; $("#github-btn").hidden = false; $("#login-fine").hidden = false;
     });
     return;
   }

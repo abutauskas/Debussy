@@ -1,8 +1,8 @@
 // GET /api/auth/github: start "Sign in with GitHub" (OAuth web flow with a one-time state cookie).
-import { OAUTH_COOKIE, err, randomBase62, redirect, setCookie, siteOrigin } from "../../../cloudflare/lib.js";
+import { OAUTH_COOKIE, randomBase62, redirect, setCookie, signupsOpen, siteOrigin } from "../../../cloudflare/lib.js";
 
 export async function onRequestGet({ request, env }) {
-  if (!env.GITHUB_CLIENT_ID || !env.GITHUB_CLIENT_SECRET || !env.DB) return err(503, "unavailable", "Sign-in is not set up yet.");
+  if (!signupsOpen(env)) return redirect("/login/?error=closed");
   // sign in on the main address only (www and *.pages.dev are sent there first), so the callback matches GitHub's
   const origin = siteOrigin(env, request);
   if (new URL(request.url).origin !== origin) return redirect(origin + "/api/auth/github");

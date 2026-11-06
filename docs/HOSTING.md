@@ -36,6 +36,9 @@ Everything except the model server runs on Cloudflare. Until the model server is
 Sign-in always runs on `https://debussylabs.com` (visitors on `www` or the `*.pages.dev` address are sent there
 first), because GitHub only returns to the registered callback URL. If the main address ever changes, set `SITE_URL`.
 
+**Sign-ups stay closed until you set `SIGNUPS_OPEN` to `true`** (plain text), even with everything above in place;
+while closed, the sign-in page says "coming soon". Remove it or set it to anything else to close them again.
+
 Optional variables: `AUTO_APPROVE` (`true` skips the waitlist), `RATE_PER_MINUTE` (20), `RATE_PER_DAY` (500),
 `MAX_KEYS` per user (5).
 
