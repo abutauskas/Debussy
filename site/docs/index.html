@@ -34,7 +34,7 @@
       <a href="/#benchmarks">Benchmarks</a>
       <a href="/docs/">API docs</a>
       <a href="/news/">News</a>
-      <a href="https://github.com/abutauskas/debussy">GitHub</a>
+      <a href="https://github.com/abutauskas/Debussy">GitHub</a>
     </nav>
     <button class="theme-btn" type="button" data-theme-toggle aria-label="Switch theme">☾</button>
     <a class="btn btn-primary btn-small" href="/login/">API access</a>
@@ -139,14 +139,14 @@ if p[&quot;response_harm&quot;] &gt; 0.5:
 
   <h2 id="self-host">Run it yourself</h2>
   <p>The same API runs on your own machine, with no key and no limits. The light variant needs about 3 GB of memory:</p>
-  <div class="code"><button class="copy" type="button" data-copy="ex-self">Copy</button><pre id="ex-self">git clone https://github.com/abutauskas/debussy &amp;&amp; cd debussy
+  <div class="code"><button class="copy" type="button" data-copy="ex-self">Copy</button><pre id="ex-self">git clone https://github.com/abutauskas/Debussy &amp;&amp; cd debussy
 pip install llama-cpp-python==0.3.36 numpy pandas pyarrow scikit-learn
 mkdir -p models &amp;&amp; curl -L -o models/Qwen3.5-4B-Q4_K_M.gguf \
   https://huggingface.co/unsloth/Qwen3.5-4B-GGUF/resolve/main/Qwen3.5-4B-Q4_K_M.gguf
 python -m debussy.server --variant light --port 8000
 # then call http://127.0.0.1:8000/v1/wildguard (no Authorization header needed)</pre></div>
   <p>For the Duo and K2 variants, start K2-Horizon with llama.cpp's <code class="inline">llama-server</code> first; see the
-    <a href="https://github.com/abutauskas/debussy/blob/HEAD/docs/K2_EXPERIMENT.md">K2 notes</a>.</p>
+    <a href="https://github.com/abutauskas/Debussy/blob/HEAD/docs/K2_EXPERIMENT.md">K2 notes</a>.</p>
 </div></article>
 </main>
 
@@ -161,10 +161,10 @@ python -m debussy.server --variant light --port 8000
       <nav aria-label="Footer">
         <a href="/docs/">API docs</a>
         <a href="/news/">News</a>
-        <a href="https://github.com/abutauskas/debussy">GitHub</a>
-        <a href="https://github.com/abutauskas/debussy/blob/HEAD/hf/README.md">Model card</a>
+        <a href="https://github.com/abutauskas/Debussy">GitHub</a>
+        <a href="https://github.com/abutauskas/Debussy/blob/HEAD/hf/README.md">Model card</a>
         <a href="/privacy/">Privacy</a>
-        <a href="https://github.com/abutauskas/debussy/blob/HEAD/LICENSE">Licence</a>
+        <a href="https://github.com/abutauskas/Debussy/blob/HEAD/LICENSE">Licence</a>
       </nav>
     </div>
     <p class="credit">Debussy is released under Apache-2.0 and builds on Qwen3.5-4B and K2-Horizon-7B (both Apache-2.0) and llama.cpp.
