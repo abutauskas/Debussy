@@ -1,7 +1,8 @@
 """Compare two base models on IDENTICAL calibration/training and test rows (WildGuard, When2Call).
 
-usage: python scripts/score/compare_bases.py wg     |   python scripts/score/compare_bases.py w2c
-Uses data/k2-horizon/{wg,w2c}.json (from transfer_run.py) and the matching rows of Qwen's saved results.
+usage: python scripts/score/compare_bases.py wg [--write]   |   python scripts/score/compare_bases.py w2c
+Uses data/k2-horizon/{wg,w2c}.json (from transfer_run.py), plus any wg_tr_*/wg_te_* extensions and natural-mix batches,
+and the matching rows of Qwen's saved results. --write also saves K2's combined rows to one file.
 All choices (head type, threshold, features) are made on the calibration/training rows only.
 """
 import os, sys, json, subprocess, tempfile
@@ -13,7 +14,21 @@ which = sys.argv[1]
 K2 = json.load(open(f"data/k2-horizon/{which}.json"))
 ktr = [r for r in K2 if r["split"] == "tr"]; kte = [r for r in K2 if r["split"] == "te"]
 
+
+def extend(rows, split):
+    """Append later rows of all_rows() saved by `transfer_run.py wg_more_cal|wg_more_test` (wg_tr_A_B.json, wg_te_A_B.json)."""
+    import glob
+    while True:
+        files = sorted(glob.glob(f"data/k2-horizon/wg_{split}_{len(rows)}_*.json"))
+        if not files: return rows
+        start, end = len(rows), int(files[-1].rsplit("_", 1)[1][:-5]); more = json.load(open(files[-1]))
+        rows = rows + more
+        if len(more) < end - start:  # still running: use what is saved, and stop here
+            print(f"note: {files[-1]} is unfinished ({len(more)}/{end - start} rows)"); return rows
+
+
 if which == "wg":
+    ktr = extend(ktr, "tr"); kte = extend(kte, "te")
     Q = json.load(open("data/wg_all_718tr_880te.json"))   # train order: same rows as all_rows() first; test: same order
     qtr = [r for r in Q if r["split"] == "tr"][:len(ktr)]; qte = [r for r in Q if r["split"] == "te"][:len(kte)]
     # add the natural-mix calibration rows, when K2 has them (same rows as Qwen's wg_natural_train*.json)
@@ -37,6 +52,8 @@ else:
     scorer, extra = "scripts/score/when2call.py", []
 
 print(f"{which}: {len(ktr)} calibration/training rows, {len(kte)} test rows, identical for both models\n")
+if "--write" in sys.argv:  # K2's combined rows, for: python scripts/score/wildguard.py FILE --natural-weights --save --heads ...
+    out = f"data/k2-horizon/{which}_all_{len(ktr)}cal_{len(kte)}te.json"; json.dump(ktr + kte, open(out, "w")); print("wrote", out, "\n")
 for name, rows in [("Qwen3.5-4B", qtr + qte), ("K2-Horizon-7B", ktr + kte)]:
     with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
         json.dump(rows, f)
