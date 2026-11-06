@@ -43,6 +43,15 @@ Every comparison below uses **identical training/calibration rows and identical 
   plain confidence rule, and none of 8 variants beat the rule even on the practice set, so Debussy keeps the rule.
   The likely reason is that the practice questions (K2 right on 65%) look nothing like Omniscience's obscure ones
   (K2 answers 9%). Code: `scripts/run/k2_embed.py`, `scripts/score/honesty_probe.py`.
+- **A second internal-state probe, for safety, also did not hold up (negative result).** A probe on K2's hidden state
+  at the harmful-reply decision point (PCA + logistic regression, plus the usual log-odds) beat the current heads on
+  nested cross-validation for all three safety questions (harmful reply 0.888 vs 0.846). On the 500 test rows it did
+  not: harmful request 0.896 vs 0.929, refusal 0.962 vs 0.962, harmful reply 0.923 vs 0.917, average **0.927 vs 0.936**.
+  It would also double the time per safety judgement (the hidden state needs a second read of the conversation). Debussy
+  keeps the heads. Two lessons: a random-noise dry run showed that picking the best of 12 settings "wins" plain CV, so
+  the rule was nested CV fixed in advance; and even nested CV inside the calibration set (balanced plus natural mix)
+  did not predict the test set. Both internal-state probes looked better inside their training data and neither carried
+  over. Code: `scripts/run/k2_wg_embed.py`, `scripts/score/wildguard_probe.py`.
 - **Small-sample swings are real.** K2's HLE lead looked like +5 on the first 150 questions and settled at +3 over 513.
 - Fixes found along the way (they help both models): a train-chosen "tool exists" cut-off (Qwen 92.8 → 93.2% on When2Call),
   token-based trimming of over-long inputs, and llama-server settings that fit 15 GB of RAM (`--cache-ram 0`).

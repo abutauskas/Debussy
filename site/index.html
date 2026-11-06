@@ -34,7 +34,7 @@
       <a href="/#benchmarks">Benchmarks</a>
       <a href="/docs/">API docs</a>
       <a href="/news/">News</a>
-      <a href="https://github.com/abutauskas/debussy">GitHub</a>
+      <a href="https://github.com/abutauskas/Debussy">GitHub</a>
     </nav>
     <button class="theme-btn" type="button" data-theme-toggle aria-label="Switch theme">☾</button>
     <a class="btn btn-primary btn-small" href="/login/">API access</a>
@@ -226,7 +226,7 @@
     <ul class="ledger">
       <li><b>Estimates, not official scores</b><span>Every number here is our own measurement. We'd welcome an independent evaluation.</span></li>
       <li><b>Below chance on HLE</b><span>13.6% against 16.4% chance. A System 1 model does not solve these questions, and we don't pretend it does.</span></li>
-      <li><b>A probe that didn't beat plain confidence</b><span>Reading K2-Horizon's internal state to predict right answers scored 51.8 against 53.1 for its own confidence. We kept the simple rule.</span></li>
+      <li><b>Two probes that didn't beat simpler rules</b><span>Reading K2-Horizon's internal state lost to its plain confidence on knowledge (51.8 vs 53.1) and to the calibrated heads on safety (0.927 vs 0.936). We kept the simple versions.</span></li>
       <li><b>Our own check caught us</b><span>On random noise, the best of 12 probe settings still “won” plain cross-validation. We now judge every new idea with nested cross-validation.</span></li>
       <li><b>Stale data, re-run</b><span>An old batch of calibration rows didn't match a fresh run (most likely it was saved before a bug fix). We re-ran it and re-fitted; the score did not move.</span></li>
       <li><b>Slow on small CPUs</b><span>About 13 s per safety judgement on the 4-core machine it was built on. GPU and laptop numbers are next.</span></li>
@@ -243,14 +243,14 @@
       <p class="lede">Clone the repository, download the 2.7 GB base model, and run the demo. The Duo and K2 variants also need
         a current build of llama.cpp's <code>llama-server</code>.</p>
       <div class="actions" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px">
-        <a class="btn btn-primary" href="https://github.com/abutauskas/debussy">View on GitHub</a>
-        <a class="btn btn-ghost" href="https://github.com/abutauskas/debussy/blob/HEAD/hf/README.md">Model card</a>
+        <a class="btn btn-primary" href="https://github.com/abutauskas/Debussy">View on GitHub</a>
+        <a class="btn btn-ghost" href="https://github.com/abutauskas/Debussy/blob/HEAD/hf/README.md">Model card</a>
       </div>
     </div>
     <div class="code" aria-label="Quick start commands">
       <button class="copy" type="button" data-copy="quickstart">Copy</button>
 <pre id="quickstart"><span class="c"># get Debussy and the light base model</span>
-git clone https://github.com/abutauskas/debussy && cd debussy
+git clone https://github.com/abutauskas/Debussy && cd Debussy
 pip install llama-cpp-python==0.3.36 numpy pandas pyarrow scikit-learn
 mkdir -p models && curl -L -o models/Qwen3.5-4B-Q4_K_M.gguf \
   https://huggingface.co/unsloth/Qwen3.5-4B-GGUF/resolve/main/Qwen3.5-4B-Q4_K_M.gguf
@@ -293,10 +293,10 @@ python -m debussy.model</pre>
       <nav aria-label="Footer">
         <a href="/docs/">API docs</a>
         <a href="/news/">News</a>
-        <a href="https://github.com/abutauskas/debussy">GitHub</a>
-        <a href="https://github.com/abutauskas/debussy/blob/HEAD/hf/README.md">Model card</a>
+        <a href="https://github.com/abutauskas/Debussy">GitHub</a>
+        <a href="https://github.com/abutauskas/Debussy/blob/HEAD/hf/README.md">Model card</a>
         <a href="/privacy/">Privacy</a>
-        <a href="https://github.com/abutauskas/debussy/blob/HEAD/LICENSE">Licence</a>
+        <a href="https://github.com/abutauskas/Debussy/blob/HEAD/LICENSE">Licence</a>
       </nav>
     </div>
     <p class="credit">Debussy is released under Apache-2.0 and builds on Qwen3.5-4B and K2-Horizon-7B (both Apache-2.0) and llama.cpp.

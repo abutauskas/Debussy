@@ -9,6 +9,10 @@ scored on folds it never saw, for the probe and for the heads alike). A plain CV
 numbers in place of hidden states, the best of 12 probe variants still "won" plain CV on all three questions and then
 lost on test. The 500 test rows are only used to report both.
 
+Result: the probe won nested CV on all three questions (harmful reply 0.888 vs 0.846) but not the test rows: harmful
+request 0.896 vs 0.929, refusal 0.962 vs 0.962, harmful reply 0.923 vs 0.917; average 0.927 vs 0.936 for the heads.
+It would also double the time per judgement. Negative result; Debussy keeps the heads.
+
 Data: data/k2-horizon/wg_all_718cal_500te.json (compare_bases.py wg --write) and emb_wg_{cal,te}.npy (k2_wg_embed.py).
 usage: python scripts/score/wildguard_probe.py [--cal-only]   (--cal-only: the calibration verdict, before test rows exist)
 """

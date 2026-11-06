@@ -86,7 +86,7 @@ rows with the same calibration rows, the Qwen-only judge scores 0.905.
 ## Quick start
 
 ```bash
-git clone https://github.com/abutauskas/debussy && cd debussy
+git clone https://github.com/abutauskas/Debussy && cd Debussy
 pip install llama-cpp-python==0.3.36 numpy pandas pyarrow scikit-learn
 mkdir -p models && curl -L -o models/Qwen3.5-4B-Q4_K_M.gguf \
   https://huggingface.co/unsloth/Qwen3.5-4B-GGUF/resolve/main/Qwen3.5-4B-Q4_K_M.gguf
@@ -156,6 +156,8 @@ No test question was used to fit or choose anything. Humanity's Last Exam was us
 We report these on purpose:
 - A probe on K2-Horizon's internal state to predict "this answer will be right" scored worse than its plain
   confidence (51.8 against 53.1 on the Omniscience stand-in).
+- A probe on K2-Horizon's internal state for the safety judge beat the current heads inside the calibration data
+  but not on the test rows (average F1 0.927 against 0.936), and it would double the time per judgement.
 - Combining both models' knowledge answers, and Wikipedia retrieval for obscure questions, gave little or nothing.
 
 ## Licence and attribution
