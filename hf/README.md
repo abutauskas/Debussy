@@ -48,8 +48,8 @@ assistant. Not an Anthropic model.
 
 | Variant | Base model(s) | RAM | Estimated index |
 |---|---|---|---|
-| **`DebussyDuo()`** (recommended) | Qwen3.5-4B for tool calls, K2-Horizon-7B for safety and knowledge | ~9 GB | **≈ 63.4** |
-| `Debussy(profile="k2-horizon", backend="server")` | K2-Horizon-7B only, run through `llama-server` | ~6 GB | ≈ 62.4 |
+| **`DebussyDuo()`** (recommended) | Qwen3.5-4B for tool calls, K2-Horizon-7B for safety and knowledge | ~9 GB | **≈ 63.7** |
+| `Debussy(profile="k2-horizon", backend="server")` | K2-Horizon-7B only, run through `llama-server` | ~6 GB | ≈ 62.8 |
 | `Debussy()` (light) | Qwen3.5-4B only, in-process | ~3 GB | ≈ 61.4 |
 
 Both base models are open (Apache-2.0) and used as 4-bit GGUF files. K2-Horizon is a reasoning model; Debussy runs it
@@ -66,9 +66,9 @@ official Artificial Analysis scores.**
 |---|---|---|---|
 | When2Call (accuracy) | 93.2% | 93.2% | 600 test questions |
 | WildGuardTest (average F1) | **0.936** | 0.899 | annotator-agreed rows: 500 (Duo), 880 (light) |
-| HLE-MultiChoice (accuracy) | 13.6% | 10.5% | all 513 text-only multiple-choice questions |
+| HLE-MultiChoice (accuracy) | 15.0% | 10.5% | all 513 text-only multiple-choice questions |
 | AA-Omniscience (½ accuracy + ½ non-hallucination) | 53.1 | 51.8 | stand-in: AA's 266 public questions |
-| **Index estimate** | **≈ 63.4** | **≈ 61.4** | |
+| **Index estimate** | **≈ 63.7** | **≈ 61.4** | |
 
 WildGuardTest for the Duo, per question: harmful request 0.929, refusal 0.962, harmful reply 0.917. On the same 500
 rows with the same calibration rows, the Qwen-only judge scores 0.905.
@@ -114,7 +114,10 @@ K2-Horizon). Setup and the full comparison: `docs/K2_EXPERIMENT.md` in the repos
    than generating text.
 2. **Calibrated heads.** Tiny logistic regressions turn those probabilities into calibrated decisions. Which head to use
    is chosen by cross-validation on training rows only.
-3. **Honest abstention.** For knowledge questions the "I don't know" option is not shown to the model. Debussy answers
+3. **Fair letters.** K2-Horizon leans towards some answer letters whatever the question. A small correction, fitted
+   on practice questions where every letter is equally likely to be right, undoes that for 5-10 options
+   (HLE-MultiChoice 13.6% → 15.0%).
+4. **Honest abstention.** For knowledge questions the "I don't know" option is not shown to the model. Debussy answers
    only when its confidence in the best option clears a threshold set on a separate practice set, and says "I don't
    know" otherwise. On the obscure Omniscience questions K2-Horizon answers only 9% of them, and when it does not know
    the answer it says "I don't know" 98% of the time instead of guessing wrong.

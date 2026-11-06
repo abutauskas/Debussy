@@ -49,6 +49,8 @@
     <h1>Introducing Debussy</h1>
     <p class="lede">An open System 1 decision model for AI agents: fast decisions and honest answers, on an ordinary CPU.</p>
     <div class="meta"><span>November 6, 2026</span><span>·</span><span>Debussy Labs</span><span>·</span><span>6 min read</span></div>
+    <p class="small muted">Updated the same day with the results of the last two experiments: the letter-bias correction
+      (HLE 13.6% → 15.0%, index ≈ 63.4 → ≈ 63.7) and a safety probe that didn't hold up.</p>
 
     <p>Most of what an AI agent does all day isn't writing essays. It's making small decisions. Is this request safe to
       fulfil? Should I call this tool now, or first ask the user for the missing date? Do I actually know the answer, or
@@ -80,8 +82,8 @@
           <tr><td>When2Call (tool calls, accuracy)</td><td class="num">93.2%</td><td class="num">93.2%</td></tr>
           <tr><td>WildGuardTest (safety, average F1)</td><td class="num">0.936</td><td class="num">0.905</td></tr>
           <tr><td>AA-Omniscience stand-in (knowledge)</td><td class="num">53.1</td><td class="num">51.8</td></tr>
-          <tr><td>HLE-MultiChoice (hard questions, accuracy)</td><td class="num">13.6%</td><td class="num">10.5%</td></tr>
-          <tr><td><strong>Estimated Decision Index</strong></td><td class="num"><strong>≈ 63.4</strong></td><td class="num"><strong>≈ 61.4</strong></td></tr>
+          <tr><td>HLE-MultiChoice (hard questions, accuracy)</td><td class="num">15.0%</td><td class="num">10.5%</td></tr>
+          <tr><td><strong>Estimated Decision Index</strong></td><td class="num"><strong>≈ 63.7</strong></td><td class="num"><strong>≈ 61.4</strong></td></tr>
         </tbody>
       </table>
     </div>
@@ -109,6 +111,12 @@
       obscure public questions, K2-Horizon answers only 9% of them, and when it doesn't know the answer it says
       “I don't know” 98% of the time instead of guessing wrong.</p>
 
+    <h2>Fair letters</h2>
+    <p>Small models lean towards some answer letters whatever the question. K2-Horizon favours “B” and avoids the last
+      option. We measured that lean on practice questions where every letter is equally likely to be right, and Debussy now
+      corrects for it. On HLE-MultiChoice, applied once, that took K2-Horizon from 13.6% to 15.0%: still below chance, but
+      honestly measured.</p>
+
     <h2>Built on a 4-core CPU</h2>
     <p>Debussy was built and evaluated on a 4-core cloud CPU with 15 GB of memory: no GPU, no API key, no paid services. It
       doesn't change the base models' weights. What it adds is the questions it asks and a few hundred calibrated numbers,
@@ -121,6 +129,9 @@
         model's plain confidence (51.8 against 53.1). We kept the simple rule.</li>
       <li><strong>Our own check caught us.</strong> With random noise in place of real data, the best of 12 probe settings still
         “won” ordinary cross-validation. Since then, every new idea is judged with nested cross-validation.</li>
+      <li><strong>A second probe, for the safety judge,</strong> looked better than the calibrated heads inside the calibration data
+        but not on the 500 test rows (average F1 0.927 against 0.936), and it would have doubled the time per judgement.
+        We kept the heads.</li>
       <li><strong>Combining the two models' knowledge answers</strong> and <strong>Wikipedia retrieval</strong> for obscure
         questions gave little or nothing.</li>
       <li><strong>Hard multiple choice:</strong> both variants score below chance (16.4%) on HLE-MultiChoice. A System 1 model does
@@ -140,8 +151,7 @@
       <li>An independent evaluation, so the numbers above stop being our estimates.</li>
       <li>Speed measurements on GPUs and laptops, and a comparison with established guard models on the full WildGuard test set.</li>
       <li>A Hugging Face release and a hosted demo you can try in the browser.</li>
-      <li>Two experiments already under way: a probe on K2-Horizon's internal state for harmful-reply judgements, and a
-        correction for letter bias on hard multiple-choice questions. We'll report both, whichever way they go.</li>
+      <li>Better speed on small machines, so a safety judgement doesn't need 13 seconds.</li>
     </ul>
 
     <div class="callout">

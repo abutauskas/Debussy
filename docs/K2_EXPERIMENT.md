@@ -14,7 +14,7 @@ Every comparison below uses **identical training/calibration rows and identical 
 |---|---|---|---|---|
 | When2Call (model-only) | **94.0%** | 89.3% | 300 | Qwen with 799 training pairs, K2 with 500 (K2 did not improve from 200 → 500) |
 | WildGuardTest (avg F1) | 90.5 | **93.6** | 500 | both calibrated on the same 718 rows (468 balanced + 250 natural mix) |
-| HLE-MultiChoice | 10.5% | **13.6%** | all 513 | chance 16.4%; both below chance, K2 less so |
+| HLE-MultiChoice | 10.5% | **13.6%**, 15.0% with the letter-bias correction | all 513 | chance 16.4%; both below chance, K2 less so |
 | Omniscience stand-in | 51.8 | **53.1** | 266 | each with its own "I don't know" threshold from the practice set (Qwen 0.7, K2 0.9) |
 
 **Index estimates** (0.25 × the four parts; the Omniscience part is a public stand-in):
@@ -22,8 +22,8 @@ Every comparison below uses **identical training/calibration rows and identical 
 | Debussy variant | When2Call | WildGuard | HLE | Omniscience | **Index** |
 |---|---|---|---|---|---|
 | Qwen3.5-4B (light default) | 93.2 (600 q) | 89.9 (880 rows) | 10.5 | 51.8 | **≈ 61.4** |
-| K2-Horizon-7B | 89.3 | 93.6 (500 rows) | 13.6 | 53.1 | **≈ 62.4** |
-| **Two specialists (recommended):** Qwen for tool calls, K2 for safety + knowledge | 93.2 | 93.6 | 13.6 | 53.1 | **≈ 63.4** |
+| K2-Horizon-7B | 89.3 | 93.6 (500 rows) | 15.0 | 53.1 | **≈ 62.8** |
+| **Two specialists (recommended):** Qwen for tool calls, K2 for safety + knowledge | 93.2 | 93.6 | 15.0 | 53.1 | **≈ 63.7** |
 
 ## What we learned
 - **K2 is the better judge and the more honest knower; Qwen is the better tool-caller.** K2's raw safety judgements are
@@ -52,6 +52,12 @@ Every comparison below uses **identical training/calibration rows and identical 
   the rule was nested CV fixed in advance; and even nested CV inside the calibration set (balanced plus natural mix)
   did not predict the test set. Both internal-state probes looked better inside their training data and neither carried
   over. Code: `scripts/run/k2_wg_embed.py`, `scripts/score/wildguard_probe.py`.
+- **K2 leans towards some answer letters, and correcting that helps a little.** On 600 HLE-shaped practice questions
+  (MMLU-Pro, 5-10 options, correct letter uniform) K2 favours B and avoids the last option (5 options: B 0.27, E 0.12,
+  fair share 0.20). A small per-option-count bias, chosen by nested CV on the practice set only (46.7% vs 45.8%), was
+  then applied once to HLE: **13.6% → 15.0%** (about 7 more right answers of 513; on its own within noise, but in the
+  direction the practice set predicted). It is part of `heads_k2-horizon.json` and applies to 5-10 options only.
+  Code: `transfer_run.py hle_practice`, `scripts/score/hle_letter_bias.py`.
 - **Small-sample swings are real.** K2's HLE lead looked like +5 on the first 150 questions and settled at +3 over 513.
 - Fixes found along the way (they help both models): a train-chosen "tool exists" cut-off (Qwen 92.8 → 93.2% on When2Call),
   token-based trimming of over-long inputs, and llama-server settings that fit 15 GB of RAM (`--cache-ram 0`).

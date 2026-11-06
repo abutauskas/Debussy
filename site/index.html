@@ -79,7 +79,7 @@
 <!-- stats -->
 <div class="wrap">
   <div class="stats" role="list">
-    <div class="stat" role="listitem"><div class="num">≈ 63.4</div><div class="lbl">Estimated Decision Index<sup>*</sup></div></div>
+    <div class="stat" role="listitem"><div class="num">≈ 63.7</div><div class="lbl">Estimated Decision Index<sup>*</sup></div></div>
     <div class="stat" role="listitem"><div class="num">0.936</div><div class="lbl">WildGuardTest F1 (safety)</div></div>
     <div class="stat" role="listitem"><div class="num">93.2%</div><div class="lbl">When2Call (tool calls)</div></div>
     <div class="stat" role="listitem"><div class="num">0 GPUs</div><div class="lbl">Built and run on a 4-core CPU</div></div>
@@ -147,8 +147,8 @@
             <tr><td>When2Call (accuracy)</td><td class="num">93.2%</td><td class="num">93.2%</td><td>600 test questions</td></tr>
             <tr><td>WildGuardTest (average F1)</td><td class="num">0.936</td><td class="num">0.905</td><td>the same 500 annotator-agreed rows</td></tr>
             <tr><td>AA-Omniscience (½ accuracy + ½ non-hallucination)</td><td class="num">53.1</td><td class="num">51.8</td><td>stand-in: 266 public questions</td></tr>
-            <tr><td>HLE-MultiChoice (accuracy)</td><td class="num">13.6%</td><td class="num">10.5%</td><td>all 513 questions (chance 16.4%)</td></tr>
-            <tr><td><strong>Estimated index</strong></td><td class="num"><strong>≈ 63.4</strong></td><td class="num"><strong>≈ 61.4</strong></td><td>0.25 × each part</td></tr>
+            <tr><td>HLE-MultiChoice (accuracy)</td><td class="num">15.0%</td><td class="num">10.5%</td><td>all 513 questions (chance 16.4%)</td></tr>
+            <tr><td><strong>Estimated index</strong></td><td class="num"><strong>≈ 63.7</strong></td><td class="num"><strong>≈ 61.4</strong></td><td>0.25 × each part</td></tr>
           </tbody>
         </table>
       </div>
@@ -176,13 +176,13 @@
       <article class="card family rec">
         <span class="badge">Recommended</span>
         <h3>Debussy Duo</h3>
-        <div class="idx">≈ 63.4<small>estimated index</small></div>
+        <div class="idx">≈ 63.7<small>estimated index</small></div>
         <dl><dt>Models</dt><dd>Qwen3.5-4B for tool calls, K2-Horizon-7B for safety and knowledge</dd><dt>Memory</dt><dd>~9 GB RAM</dd></dl>
         <code>DebussyDuo()</code>
       </article>
       <article class="card family">
         <h3>Debussy K2</h3>
-        <div class="idx">≈ 62.4<small>estimated index</small></div>
+        <div class="idx">≈ 62.8<small>estimated index</small></div>
         <dl><dt>Model</dt><dd>K2-Horizon-7B, a reasoning model run with its thinking switched off</dd><dt>Memory</dt><dd>~6 GB RAM</dd></dl>
         <code>Debussy(profile="k2-horizon", backend="server")</code>
       </article>
@@ -225,7 +225,7 @@
     </div>
     <ul class="ledger">
       <li><b>Estimates, not official scores</b><span>Every number here is our own measurement. We'd welcome an independent evaluation.</span></li>
-      <li><b>Below chance on HLE</b><span>13.6% against 16.4% chance. A System 1 model does not solve these questions, and we don't pretend it does.</span></li>
+      <li><b>Below chance on HLE</b><span>15.0% against 16.4% chance, even after correcting the model's lean towards some answer letters. A System 1 model does not solve these questions, and we don't pretend it does.</span></li>
       <li><b>Two probes that didn't beat simpler rules</b><span>Reading K2-Horizon's internal state lost to its plain confidence on knowledge (51.8 vs 53.1) and to the calibrated heads on safety (0.927 vs 0.936). We kept the simple versions.</span></li>
       <li><b>Our own check caught us</b><span>On random noise, the best of 12 probe settings still “won” plain cross-validation. We now judge every new idea with nested cross-validation.</span></li>
       <li><b>Stale data, re-run</b><span>An old batch of calibration rows didn't match a fresh run (most likely it was saved before a bug fix). We re-ran it and re-fitted; the score did not move.</span></li>

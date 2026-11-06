@@ -5,8 +5,8 @@ built on a 4-core CPU with no GPU and no API key. Small open models answer short
 (no step-by-step reasoning), and tiny calibrated heads (`heads.json`) turn those answers into a probability for every
 option. When unsure, Debussy prefers an honest "I don't know" over a guess.
 
-**Estimated Decision Index ≈ 63.4** with two specialists (`DebussyDuo`: Qwen3.5-4B for tool calls, K2-Horizon-7B for
-safety and knowledge): When2Call 93.2 · WildGuardTest 0.936 · HLE 13.6 · Omniscience stand-in 53.1. The light
+**Estimated Decision Index ≈ 63.7** with two specialists (`DebussyDuo`: Qwen3.5-4B for tool calls, K2-Horizon-7B for
+safety and knowledge): When2Call 93.2 · WildGuardTest 0.936 · HLE 15.0 · Omniscience stand-in 53.1. The light
 single-model default (`Debussy()`, Qwen3.5-4B only) is ≈ 61.4. These are our own estimates, not official scores. Details, methods and caveats: **[docs/RESULTS.md](docs/RESULTS.md)**.
 
 ## Use it
@@ -28,8 +28,8 @@ d.choice(question, options + ["I don't know"])   # abstains when it is not confi
 | Variant | Base model(s) | RAM | Estimated index |
 |---|---|---|---|
 | `Debussy()` (default) | Qwen3.5-4B, in-process | ~3 GB | ≈ 61.4 |
-| `Debussy(profile="k2-horizon", backend="server")` | K2-Horizon-7B with thinking off, via `llama-server` | ~6 GB | ≈ 62.4 |
-| **`DebussyDuo()`** (recommended) | Qwen for tool calls, K2 for safety and knowledge | ~9 GB | **≈ 63.4** |
+| `Debussy(profile="k2-horizon", backend="server")` | K2-Horizon-7B with thinking off, via `llama-server` | ~6 GB | ≈ 62.8 |
+| **`DebussyDuo()`** (recommended) | Qwen for tool calls, K2 for safety and knowledge | ~9 GB | **≈ 63.7** |
 
 Every variant still makes each decision in a single pass. K2 needs a current llama.cpp build of `llama-server`
 (the pinned `llama-cpp-python` cannot load it). How it compares, and how to run it: **[docs/K2_EXPERIMENT.md](docs/K2_EXPERIMENT.md)**.

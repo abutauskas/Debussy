@@ -11,7 +11,11 @@ Selection, fixed in advance: nested 5-fold CV accuracy on the practice set (pick
 folds never seen); a correction is used only if the selection procedure beats "none" there. HLE is only read for the
 final before/after line. Questions with more than 10 options (not covered by the practice set) are left unchanged.
 
-usage: python scripts/score/hle_letter_bias.py
+usage: python scripts/score/hle_letter_bias.py [--save --heads debussy/heads_k2-horizon.json]
+       (--save stores the chosen correction in the heads file, only if the rule says to use one)
+
+Result: K2 leans towards B and away from the last option (E 0.12 vs 0.20 on 5-option questions). Nested CV on the
+practice set: 46.7% with the correction vs 45.8% without, so per_k(0.3) is used. HLE, applied once: 13.6% -> 15.0%.
 """
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))  # repo root on the path
@@ -54,7 +58,9 @@ def fit_bias(rows, lam, per_k):
 
     th = minimize(f, np.zeros(npar), jac=True, method="L-BFGS-B").x
     if per_k:
-        B = th.reshape(6, KMAX); return lambda r: np.log(np.clip(r["p"], 1e-9, 1)) + B[len(r["p"]) - 5, :len(r["p"])]
+        B = th.reshape(6, KMAX); fn = lambda r: np.log(np.clip(r["p"], 1e-9, 1)) + B[len(r["p"]) - 5, :len(r["p"])]
+        fn.params = {"k_min": 5, "k_max": KMAX, "lam": lam, "bias": [[round(float(v), 5) for v in row[:5 + i]] for i, row in enumerate(B)]}
+        return fn
     b, c = th[:KMAX], th[KMAX]
     return lambda r: np.log(np.clip(r["p"], 1e-9, 1)) + b[:len(r["p"])] + c * (np.arange(len(r["p"])) == len(r["p"]) - 1)
 
@@ -103,5 +109,9 @@ if __name__ == "__main__":
     covered = [r for r in rows if 5 <= len(r["p"]) <= KMAX]
     after = np.mean([int(np.argmax(corr(r) if 5 <= len(r["p"]) <= KMAX else r["p"]) == r["ans"]) for r in rows])
     before = np.mean([int(np.argmax(r["p"]) == r["ans"]) for r in rows])
+    if "--save" in sys.argv and use and hasattr(corr, "params"):
+        hp = sys.argv[sys.argv.index("--heads") + 1]; h = json.load(open(hp))
+        h["letter_bias"] = {"method": best, "chosen_on": f"{len(pr)} HLE-shaped MMLU-Pro practice questions (nested CV)", **corr.params}
+        json.dump(h, open(hp, "w"), indent=1); print("saved letter_bias ->", hp)
     print(f"\nHLE-MultiChoice ({len(rows)} q; {len(covered)} with 5-10 options get the correction): "
           f"before {before*100:.1f}%  after {after*100:.1f}%  (chance {np.mean([1/len(r['p']) for r in rows])*100:.1f}%)")

@@ -37,7 +37,7 @@
       note: "The same 500 annotator-agreed test rows for both variants." },
     { name: "AA-Omniscience", sub: "Knowledge · ½ accuracy + ½ non-hallucination", duo: 53.1, light: 51.8, fmt: function (v) { return v.toFixed(1); },
       note: "Stand-in: Artificial Analysis's 266 public questions." },
-    { name: "HLE-MultiChoice", sub: "Hard multiple choice · accuracy", duo: 13.6, light: 10.5, chance: 16.4, fmt: function (v) { return v.toFixed(1) + "%"; },
+    { name: "HLE-MultiChoice", sub: "Hard multiple choice · accuracy", duo: 15.0, light: 10.5, chance: 16.4, fmt: function (v) { return v.toFixed(1) + "%"; },
       note: "All 513 text-only questions. Chance is 16.4%." }
   ];
   var tip = document.createElement("div"); tip.className = "tooltip"; tip.setAttribute("role", "tooltip"); document.body.appendChild(tip);

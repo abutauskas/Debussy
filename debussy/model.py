@@ -86,6 +86,14 @@ class Debussy:
                 out[k] = float(sig(lo[k]))
         return out
 
+    def _letter_bias(self, pr):
+        """Undo the base model's lean towards some answer letters (e.g. away from the last option), as fitted on a
+        practice set where the right letter is uniform (scripts/score/hle_letter_bias.py). 5-10 options only."""
+        lb = self.h.get("letter_bias"); k = len(pr)
+        if not lb or not lb["k_min"] <= k <= lb["k_max"]: return pr
+        q = np.asarray(pr, dtype=float) * np.exp(np.array(lb["bias"][k - lb["k_min"]][:k]))
+        return q / q.sum()
+
     # ---- generic multiple choice with optional "I don't know" ---------------------------------
     def choice(self, question, options, idk_option=None):
         """Probability per option. An "I don't know" option (passed as idk_option, or found among `options` by its
@@ -98,6 +106,7 @@ class Debussy:
         L = [chr(65 + i) for i in range(len(options))]
         body = question + "\n\n" + "\n".join(f"{l}. {o}" for l, o in zip(L, options))
         pr = self.e.letter_probs("Answer the multiple-choice question with the letter of the correct option.\n\n" + body, L)
+        pr = self._letter_bias(pr)
         out = {o: float(x) for o, x in zip(options, pr)}
         if idk_option is not None:
             t = self.h.get("idk_threshold", 1.01)
