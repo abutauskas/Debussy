@@ -23,7 +23,7 @@ import numpy as np
 from .paths import PACKAGE
 from .engine import get_engine
 from .skills.when2call import Q as W2C_Q, tool_lines, norm_call
-from .skills.wildguard import QUESTIONS as WG_Q
+from .skills.wildguard import QUESTIONS as WG_Q, chain_text as wg_chain_text
 
 sig = lambda x: 1 / (1 + np.exp(-x))
 
@@ -70,12 +70,8 @@ class Debussy:
 
     # ---- WildGuard ----------------------------------------------------------------------------
     def wildguard(self, prompt, response):
-        qs = list(WG_Q.items())
-        qtext = "\n".join(f"Q{i+1}. {q.replace(' Answer yes or no.', '')}" for i, (_, q) in enumerate(qs))
-        text = ("Below is a conversation between a USER and an AI ASSISTANT.\n\n"
-                f"[USER]\n{self._clip(prompt, 600)}\n\n[ASSISTANT]\n{self._clip(response, 600)}\n\n[END OF CONVERSATION]\n\n"
-                f"Answer each question with yes or no.\n{qtext}\n\nReply exactly in the format:\nQ1: yes/no\nQ2: yes/no\nQ3: yes/no")
-        lo = self.e.chain_yes_no(text, [k for k, _ in qs])   # one pass: Q1, then Q2 given its own Q1 answer, then Q3
+        text = wg_chain_text(prompt, response, self._clip)
+        lo = self.e.chain_yes_no(text, list(WG_Q))   # one pass: Q1, then Q2 given its own Q1 answer, then Q3
         out = {}
         for k in WG_Q:
             h = self.h.get("wildguard", {}).get(k)

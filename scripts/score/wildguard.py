@@ -21,10 +21,7 @@ from sklearn.metrics import f1_score
 from sklearn.model_selection import StratifiedKFold
 from debussy.paths import ROOT as _ROOT
 
-rows = json.load(open(sys.argv[1]))
 K = ["prompt_harm", "refusal", "response_harm"]
-tr = [r for r in rows if r["split"] == "tr"]; te = [r for r in rows if r["split"] == "te"]
-print(f"train {len(tr)}  test {len(te)}")
 TH = np.linspace(-8, 8, 161)
 sig = lambda x: 1 / (1 + np.exp(-x))
 
@@ -36,8 +33,11 @@ def X(rs, inter=False):
     return np.c_[a, ph * (1 - ref), rh * ph, rh * (1 - ref)]
 
 
+NATURAL = "--natural-weights" in sys.argv   # importing scripts may set wildguard.NATURAL = True
+
+
 def natural_weights(rs):
-    if "--natural-weights" not in sys.argv: return np.ones(len(rs))
+    if not NATURAL: return np.ones(len(rs))
     import pandas as pd
     COL = {"prompt_harm": "prompt_harm_label", "refusal": "response_refusal_label", "response_harm": "response_harm_label"}
     POS = {"prompt_harm": "harmful", "refusal": "refusal", "response_harm": "harmful"}
@@ -68,29 +68,38 @@ def fit(method, rs_tr, ytr, w, j):
     return (lambda rs: (m.predict_proba(X(rs, inter))[:, 1] > th).astype(int)), head
 
 
-heads, chosen_f1 = {}, []
 METHODS = ["raw", "shift", "lr3", "lrx"]
-for j, k in enumerate(K):
-    trk = [r for r in tr if r["y"][k] is not None]; tek = [r for r in te if r["y"][k] is not None]
-    ytr = np.array([r["y"][k] for r in trk]); yte = np.array([r["y"][k] for r in tek]); w = natural_weights(trk)
-    cv = {}
-    for meth in METHODS:
-        s = []
-        for a, b in StratifiedKFold(5, shuffle=True, random_state=0).split(np.zeros(len(ytr)), ytr):
-            pred, _ = fit(meth, [trk[i] for i in a], ytr[a], w[a], j)
-            s.append(f1w(ytr[b], pred([trk[i] for i in b]), w[b]))
-        cv[meth] = np.mean(s)
-    best = max(cv, key=cv.get)
-    test = {meth: f1_score(yte, fit(meth, trk, ytr, w, j)[0](tek)) if len(tek) else float("nan") for meth in METHODS}
-    _, heads[k] = fit(best, trk, ytr, w, j); heads[k]["method"] = best; heads[k]["n_train"] = len(trk)
-    heads[k]["weighting"] = "natural" if "--natural-weights" in sys.argv else "uniform"
-    chosen_f1.append(test[best])
-    print(f"{k:14s} train-CV " + " ".join(f"{m}={v:.3f}" for m, v in cv.items()) + f" -> {best:5s} | test n={len(tek)} "
-          + " ".join(f"{m}={v:.3f}" for m, v in test.items()) + f" | chosen={test[best]:.3f}")
-print(f"AVERAGE F1 (method chosen on train): {np.mean(chosen_f1):.3f}")
-if "--save" in sys.argv:
-    import os
-    from debussy.paths import HEADS
-    HEADS = sys.argv[sys.argv.index("--heads") + 1] if "--heads" in sys.argv else HEADS  # e.g. debussy/heads_k2-horizon.json
-    h = json.load(open(HEADS)) if os.path.exists(HEADS) else {}
-    h["wildguard"] = heads; json.dump(h, open(HEADS, "w"), indent=1); print("saved wildguard heads ->", HEADS)
+
+
+def cv_f1(meth, trk, ytr, w, j):
+    """5-fold cross-validated (weighted) F1 of one method on the calibration rows - the selection rule."""
+    s = []
+    for a, b in StratifiedKFold(5, shuffle=True, random_state=0).split(np.zeros(len(ytr)), ytr):
+        pred, _ = fit(meth, [trk[i] for i in a], ytr[a], w[a], j)
+        s.append(f1w(ytr[b], pred([trk[i] for i in b]), w[b]))
+    return np.mean(s)
+
+
+if __name__ == "__main__":
+    rows = json.load(open(sys.argv[1]))
+    tr = [r for r in rows if r["split"] == "tr"]; te = [r for r in rows if r["split"] == "te"]
+    print(f"train {len(tr)}  test {len(te)}")
+    heads, chosen_f1 = {}, []
+    for j, k in enumerate(K):
+        trk = [r for r in tr if r["y"][k] is not None]; tek = [r for r in te if r["y"][k] is not None]
+        ytr = np.array([r["y"][k] for r in trk]); yte = np.array([r["y"][k] for r in tek]); w = natural_weights(trk)
+        cv = {meth: cv_f1(meth, trk, ytr, w, j) for meth in METHODS}
+        best = max(cv, key=cv.get)
+        test = {meth: f1_score(yte, fit(meth, trk, ytr, w, j)[0](tek)) if len(tek) else float("nan") for meth in METHODS}
+        _, heads[k] = fit(best, trk, ytr, w, j); heads[k]["method"] = best; heads[k]["n_train"] = len(trk)
+        heads[k]["weighting"] = "natural" if "--natural-weights" in sys.argv else "uniform"
+        chosen_f1.append(test[best])
+        print(f"{k:14s} train-CV " + " ".join(f"{m}={v:.3f}" for m, v in cv.items()) + f" -> {best:5s} | test n={len(tek)} "
+              + " ".join(f"{m}={v:.3f}" for m, v in test.items()) + f" | chosen={test[best]:.3f}")
+    print(f"AVERAGE F1 (method chosen on train): {np.mean(chosen_f1):.3f}")
+    if "--save" in sys.argv:
+        import os
+        from debussy.paths import HEADS
+        HEADS = sys.argv[sys.argv.index("--heads") + 1] if "--heads" in sys.argv else HEADS  # e.g. debussy/heads_k2-horizon.json
+        h = json.load(open(HEADS)) if os.path.exists(HEADS) else {}
+        h["wildguard"] = heads; json.dump(h, open(HEADS, "w"), indent=1); print("saved wildguard heads ->", HEADS)
