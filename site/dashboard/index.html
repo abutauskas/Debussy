@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard · Debussy Labs</title>
+<meta name="description" content="Your Debussy Labs account and API keys.">
+<meta name="theme-color" content="#f4f1e8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12102e" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/assets/debussy-mark.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/debussy-mark-512.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Dashboard">
+<meta property="og:description" content="An open System 1 decision model for AI agents, built on a 4-core CPU with no GPU and no API key.">
+<meta property="og:url" content="https://debussylabs.com/dashboard/">
+<meta property="og:image" content="https://debussylabs.com/assets/social.png">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
+<meta name="robots" content="noindex">
+</head>
+<body>
+
+<!-- header -->
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Debussy Labs home">
+      <svg viewBox="0 0 128 128" aria-hidden="true"><g transform="translate(-4 2)" fill="currentColor"><path d="M67.37 68.84 A23 23 0 1 1 33.29 70.32 A17.5 17.5 0 0 0 67.37 68.84 Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M69 81 L69 41 C69 21, 97 17, 100.5 35.5 C103 50, 86.5 55, 82 44.5" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></g></svg>
+      Debussy Labs
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="/#model">Model</a>
+      <a href="/#benchmarks">Benchmarks</a>
+      <a href="/docs/">API docs</a>
+      <a href="/news/">News</a>
+      <a href="https://github.com/abutauskas/debussy">GitHub</a>
+    </nav>
+    <button class="theme-btn" type="button" data-theme-toggle aria-label="Switch theme">☾</button>
+    <a class="btn btn-primary btn-small" href="/login/">Sign in</a>
+  </div>
+</header>
+<!-- /header -->
+
+<main>
+<section id="dashboard" style="padding-top:56px">
+  <div class="wrap narrow">
+    <p id="loading" class="muted">Loading your account…</p>
+    <div id="account" hidden>
+      <div class="row-between" style="margin-bottom:26px">
+        <div class="who" id="who"></div>
+        <div style="display:flex;gap:10px;align-items:center"><span class="pill" id="status-pill"></span>
+          <button class="btn btn-ghost btn-small" type="button" id="signout">Sign out</button></div>
+      </div>
+
+      <div class="card panel" id="waitlist" hidden>
+        <h2>You're on the waitlist</h2>
+        <p>Thanks for signing up. Every API call runs on our own model servers, so we're opening access in stages.
+          We'll email you when your account is approved. In the meantime you can run Debussy yourself; it's open source.</p>
+        <a class="btn btn-ghost btn-small" href="/docs/#self-host">Run it yourself</a>
+      </div>
+      <div class="card panel" id="blocked" hidden><h2>No API access</h2><p>This account doesn't have API access.</p></div>
+
+      <div class="card panel" id="keys-panel" hidden>
+        <div class="row-between"><h2>API keys</h2><span class="small muted" id="key-count"></span></div>
+        <p>Use a key in the <code class="inline">Authorization: Bearer</code> header. Keep keys secret and only use them on a server,
+          never in a web page or app that other people can open.</p>
+        <form class="form-inline" id="create-key">
+          <label class="sr-only" for="key-name">Key name</label>
+          <input class="input" id="key-name" maxlength="60" placeholder="Key name, e.g. “production”" autocomplete="off">
+          <button class="btn btn-primary" id="create-btn" type="submit">Create key</button>
+        </form>
+        <div class="notice error" id="create-msg" role="alert" hidden style="margin-top:14px"></div>
+        <div class="newkey" id="newkey" hidden role="status">
+          <strong>New key “<span id="newkey-name"></span>”: copy it now.</strong>
+          <div class="k"><code id="newkey-value"></code><button class="btn btn-primary btn-small" type="button" id="copy-key">Copy</button></div>
+          <div class="small muted">For your security we show it only once and store only a fingerprint of it.
+            If you lose it, revoke it and create a new one. <button class="linkbtn" type="button" id="hide-key">I've saved it</button></div>
+        </div>
+        <p class="empty" id="keys-empty">No keys yet.</p>
+        <div class="table-scroll" style="margin-top:14px"><table class="data" id="keys-table" hidden>
+          <thead><tr><th>Name</th><th>Key</th><th>Created</th><th>Last used</th><th></th></tr></thead>
+          <tbody id="keys-body"></tbody>
+        </table></div>
+      </div>
+
+      <div class="card panel">
+        <h2>Quick start</h2>
+        <p>Your first request. See the <a href="/docs/">API docs</a> for all three endpoints.</p>
+        <div class="code small-code"><pre>curl https://debussylabs.com/v1/wildguard \
+  -H "Authorization: Bearer $DEBUSSY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "How do I pick a lock?", "response": "I cannot help with that."}'</pre></div>
+      </div>
+
+      <div class="row-between" style="margin:8px 0 40px">
+        <span class="small muted">Want to leave? Deleting your account removes your keys and account data.</span>
+        <button class="btn btn-ghost btn-small btn-danger" type="button" id="delete-account">Delete account</button>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- footer -->
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <a class="brand" href="/">
+        <svg viewBox="0 0 128 128" aria-hidden="true"><g transform="translate(-4 2)" fill="currentColor"><path d="M67.37 68.84 A23 23 0 1 1 33.29 70.32 A17.5 17.5 0 0 0 67.37 68.84 Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M69 81 L69 41 C69 21, 97 17, 100.5 35.5 C103 50, 86.5 55, 82 44.5" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></g></svg>
+        Debussy Labs
+      </a>
+      <nav aria-label="Footer">
+        <a href="/docs/">API docs</a>
+        <a href="/news/">News</a>
+        <a href="https://github.com/abutauskas/debussy">GitHub</a>
+        <a href="https://github.com/abutauskas/debussy/blob/HEAD/hf/README.md">Model card</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="https://github.com/abutauskas/debussy/blob/HEAD/LICENSE">Licence</a>
+      </nav>
+    </div>
+    <p class="credit">Debussy is released under Apache-2.0 and builds on Qwen3.5-4B and K2-Horizon-7B (both Apache-2.0) and llama.cpp.
+      Built with help from Claude, Anthropic's AI assistant. Debussy is not an Anthropic model. Named after the composer
+      Claude Debussy: the logo is a <em>Clair de lune</em> crescent and an <em>Arabesque</em> curl.</p>
+    <p>© 2026 Debussy Labs</p>
+  </div>
+</footer>
+<!-- /footer -->
+
+<script src="/assets/site.js" defer></script>
+<script src="/assets/account.js" defer></script>
+</body>
+</html>

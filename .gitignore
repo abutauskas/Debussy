@@ -23,3 +23,8 @@ __pycache__/
 *.pyc
 .venv/
 .ipynb_checkpoints/
+
+# Cloudflare local secrets and state (never commit)
+.dev.vars
+.wrangler/
+node_modules/

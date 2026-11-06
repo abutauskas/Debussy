@@ -1,0 +1,16 @@
+name = "debussylabs-local"   # local testing only; production settings live in the Cloudflare dashboard
+pages_build_output_dir = "./site"
+compatibility_date = "2025-09-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "debussy-local"
+database_id = "00000000-0000-0000-0000-000000000000"
+
+[vars]
+GITHUB_CLIENT_ID = "test-client"
+GITHUB_TOKEN_URL = "http://127.0.0.1:8012/login/oauth/access_token"
+GITHUB_API_URL = "http://127.0.0.1:8012"
+INFERENCE_URL = "http://127.0.0.1:8011"
+AUTO_APPROVE = "false"
+RATE_PER_MINUTE = "5"

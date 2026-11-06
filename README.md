@@ -38,6 +38,7 @@ Every variant still makes each decision in a single pass. K2 needs a current lla
 ```
 debussy/                 the model (Python package)
   model.py                 Debussy and DebussyDuo: when2call(), wildguard(), choice()
+  server.py                HTTP API: python -m debussy.server (the same endpoints as debussylabs.com/v1)
   engine.py                model-agnostic core: base-model profiles + backends (see docs/TRANSFER.md)
   heads.json               trained head weights and thresholds (tiny); heads_k2-horizon.json for K2
   paths.py                 where data/, models/ and heads.json live
@@ -51,7 +52,9 @@ docs/                    RESULTS.md (scores, methods, caveats) · TRANSFER.md (m
                          · K2_EXPERIMENT.md (Qwen vs K2-Horizon, the two-specialist variant)
 brand/                   logo, wordmarks, exports; archive/ holds earlier logo versions
 hf/README.md             model card for Hugging Face (upload with the heads files and the logo)
-site/                    debussylabs.com: static site (home page, news, 404), served by Cloudflare Pages
+site/                    debussylabs.com: static pages (home, news, API docs, sign-in, dashboard, privacy)
+functions/               Cloudflare Pages Functions: GitHub sign-in, API keys, the /v1 gateway (docs/HOSTING.md)
+cloudflare/              database schema, shared helpers, local test harness
 data/README.md           how to get the datasets (not stored here; some are gated)
 ```
 Scripts in `scripts/` run from anywhere; package modules run as `python -m debussy.skills.<name>` from the repository root.

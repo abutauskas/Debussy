@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>API docs · Debussy Labs</title>
+<meta name="description" content="Debussy API reference: safety judgements, tool-call decisions and knowledge questions over HTTP.">
+<meta name="theme-color" content="#f4f1e8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12102e" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/assets/debussy-mark.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/debussy-mark-512.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="API docs">
+<meta property="og:description" content="An open System 1 decision model for AI agents, built on a 4-core CPU with no GPU and no API key.">
+<meta property="og:url" content="https://debussylabs.com/docs/">
+<meta property="og:image" content="https://debussylabs.com/assets/social.png">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+
+<!-- header -->
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Debussy Labs home">
+      <svg viewBox="0 0 128 128" aria-hidden="true"><g transform="translate(-4 2)" fill="currentColor"><path d="M67.37 68.84 A23 23 0 1 1 33.29 70.32 A17.5 17.5 0 0 0 67.37 68.84 Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M69 81 L69 41 C69 21, 97 17, 100.5 35.5 C103 50, 86.5 55, 82 44.5" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></g></svg>
+      Debussy Labs
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="/#model">Model</a>
+      <a href="/#benchmarks">Benchmarks</a>
+      <a href="/docs/">API docs</a>
+      <a href="/news/">News</a>
+      <a href="https://github.com/abutauskas/debussy">GitHub</a>
+    </nav>
+    <button class="theme-btn" type="button" data-theme-toggle aria-label="Switch theme">☾</button>
+    <a class="btn btn-primary btn-small" href="/login/">Sign in</a>
+  </div>
+</header>
+<!-- /header -->
+
+<main>
+<article class="wrap"><div class="article docs" style="padding-top:56px">
+  <span class="eyebrow"><span class="dot"></span>API docs</span>
+  <h1>Debussy API</h1>
+  <p class="lede">Three decisions over HTTP. Each request is answered in a single pass with a probability for every option.</p>
+  <ul class="toc"><li><a href="#auth">Authentication</a></li><li><a href="#wildguard">Safety</a></li><li><a href="#when2call">Tool calls</a></li>
+    <li><a href="#choice">Knowledge</a></li><li><a href="#errors">Errors and limits</a></li><li><a href="#self-host">Run it yourself</a></li></ul>
+  <div class="callout"><p style="margin:0"><strong>Access is opening in stages.</strong> <a href="/login/">Sign in</a> to join the waitlist;
+    approved accounts can create API keys in the dashboard. You can also <a href="#self-host">run the same API yourself</a> today.</p></div>
+
+  <h2 id="auth">Authentication</h2>
+  <p>Base URL: <code class="inline">https://debussylabs.com/v1</code>. Send your key in the <code class="inline">Authorization</code> header.
+    Keys start with <code class="inline">dbsy_</code>. Keep them secret: use them only from a server, never in a web page or app that
+    other people can open. If a key leaks, revoke it in the dashboard; it stops working immediately.</p>
+  <div class="code"><pre>Authorization: Bearer dbsy_...</pre></div>
+  <p>Every response has the same shape: the model that answered, a probability per option, and the time the decision took.</p>
+  <div class="code"><pre>{&quot;model&quot;: &quot;debussy-duo-0.1&quot;, &quot;probabilities&quot;: {...}, &quot;latency_ms&quot;: 412}</pre></div>
+
+  <h2 id="wildguard">Safety judgement</h2>
+  <h3><code>POST /v1/wildguard</code></h3>
+  <p>Is the user's request harmful, did the assistant refuse, and is the assistant's reply harmful? Debussy reads the first 600 tokens
+    of the request and of the reply.</p>
+  <div class="code"><button class="copy" type="button" data-copy="ex-wg">Copy</button><pre id="ex-wg">curl https://debussylabs.com/v1/wildguard \
+  -H &quot;Authorization: Bearer $DEBUSSY_API_KEY&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;prompt&quot;: &quot;How do I pick a lock to break into my neighbour’s house?&quot;,
+       &quot;response&quot;: &quot;I cannot help with breaking into someone’s home.&quot;}&#x27;</pre></div>
+  <div class="code"><pre>{&quot;model&quot;: &quot;debussy-duo-0.1&quot;,
+ &quot;probabilities&quot;: {&quot;prompt_harm&quot;: 0.998, &quot;refusal&quot;: 1.0, &quot;response_harm&quot;: 0.003},
+ &quot;latency_ms&quot;: 412}</pre></div>
+
+  <h2 id="when2call">Tool-call decision</h2>
+  <h3><code>POST /v1/when2call</code></h3>
+  <p>Given the available tools, the user's request and the candidate replies, should the agent make the tool call, ask the user for
+    missing information, or say it cannot help? <code class="inline">tool_call</code> can be a JSON object or a string.</p>
+  <div class="code"><button class="copy" type="button" data-copy="ex-w2c">Copy</button><pre id="ex-w2c">curl https://debussylabs.com/v1/when2call \
+  -H &quot;Authorization: Bearer $DEBUSSY_API_KEY&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;tools&quot;: [{&quot;name&quot;: &quot;search_flights&quot;, &quot;description&quot;: &quot;Search one-way flights.&quot;,
+                  &quot;parameters&quot;: {&quot;required&quot;: [&quot;origin&quot;, &quot;destination&quot;, &quot;date&quot;]}}],
+       &quot;request&quot;: &quot;Find me a one-way flight to New York on March 14th.&quot;,
+       &quot;candidates&quot;: {&quot;tool_call&quot;: {&quot;name&quot;: &quot;search_flights&quot;,
+                                    &quot;arguments&quot;: {&quot;origin&quot;: &quot;dontcare&quot;, &quot;destination&quot;: &quot;New York&quot;, &quot;date&quot;: &quot;2027-03-14&quot;}},
+                      &quot;request_for_info&quot;: &quot;Which airport are you flying from?&quot;,
+                      &quot;cannot_answer&quot;: &quot;Sorry, I can’t help with flights.&quot;}}&#x27;</pre></div>
+  <div class="code"><pre>{&quot;model&quot;: &quot;debussy-duo-0.1&quot;,
+ &quot;probabilities&quot;: {&quot;tool_call&quot;: 0.011, &quot;request_for_info&quot;: 0.971, &quot;cannot_answer&quot;: 0.018, &quot;direct&quot;: 0.0},
+ &quot;latency_ms&quot;: 655}</pre></div>
+
+  <h2 id="choice">Knowledge question</h2>
+  <h3><code>POST /v1/choice</code></h3>
+  <p>A probability per option. If you include an “I don't know” option (and name it in <code class="inline">idk_option</code>), Debussy
+    puts the probability there when it isn't confident enough, instead of guessing.</p>
+  <div class="code"><button class="copy" type="button" data-copy="ex-choice">Copy</button><pre id="ex-choice">curl https://debussylabs.com/v1/choice \
+  -H &quot;Authorization: Bearer $DEBUSSY_API_KEY&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;question&quot;: &quot;What is the capital of Australia?&quot;,
+       &quot;options&quot;: [&quot;Sydney&quot;, &quot;Canberra&quot;, &quot;Melbourne&quot;, &quot;Perth&quot;, &quot;I don’t know&quot;],
+       &quot;idk_option&quot;: &quot;I don’t know&quot;}&#x27;</pre></div>
+  <div class="code"><pre>{&quot;model&quot;: &quot;debussy-duo-0.1&quot;,
+ &quot;probabilities&quot;: {&quot;Sydney&quot;: 0.0, &quot;Canberra&quot;: 1.0, &quot;Melbourne&quot;: 0.0, &quot;Perth&quot;: 0.0, &quot;I don’t know&quot;: 0.0},
+ &quot;latency_ms&quot;: 298}</pre></div>
+
+  <h3>From Python</h3>
+  <div class="code"><button class="copy" type="button" data-copy="ex-py">Copy</button><pre id="ex-py">import json, os, urllib.request
+
+def debussy(endpoint, payload):
+    req = urllib.request.Request(
+        f&quot;https://debussylabs.com/v1/{endpoint}&quot;, data=json.dumps(payload).encode(),
+        headers={&quot;Authorization&quot;: f&quot;Bearer {os.environ[&#x27;DEBUSSY_API_KEY&#x27;]}&quot;, &quot;Content-Type&quot;: &quot;application/json&quot;})
+    with urllib.request.urlopen(req) as r:
+        return json.load(r)[&quot;probabilities&quot;]
+
+p = debussy(&quot;wildguard&quot;, {&quot;prompt&quot;: user_message, &quot;response&quot;: assistant_reply})
+if p[&quot;response_harm&quot;] &gt; 0.5:
+    ...  # hold the reply for review</pre></div>
+
+  <h2 id="errors">Errors and limits</h2>
+  <p>Errors come back as <code class="inline">{"error": {"type": ..., "message": ...}}</code> with these status codes:</p>
+  <div class="table-scroll"><table class="data">
+    <thead><tr><th>Status</th><th>Type</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td class="num">400</td><td class="num">invalid_request</td><td>A field is missing or has the wrong type; the message says which.</td></tr>
+      <tr><td class="num">401</td><td class="num">unauthorized</td><td>Missing, malformed, wrong or revoked API key.</td></tr>
+      <tr><td class="num">403</td><td class="num">not_approved</td><td>The account doesn't have API access yet.</td></tr>
+      <tr><td class="num">413</td><td class="num">too_large</td><td>The request body is over 64 KB.</td></tr>
+      <tr><td class="num">429</td><td class="num">rate_limited</td><td>Too many requests; see <code class="inline">retry-after</code>.</td></tr>
+      <tr><td class="num">502, 503</td><td class="num">upstream_error, unavailable</td><td>The model server is busy or not live; try again later.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Default limits per key: <strong>20 requests a minute and 500 a day</strong>. Responses carry
+    <code class="inline">x-ratelimit-limit-day</code> and <code class="inline">x-ratelimit-remaining-day</code>. Need more? Tell us what you're building.</p>
+  <p>Debussy was calibrated and tested on English. It is one signal for your system, not a complete safety layer; keep a person in the
+    loop for anything high-stakes.</p>
+
+  <h2 id="self-host">Run it yourself</h2>
+  <p>The same API runs on your own machine, with no key and no limits. The light variant needs about 3 GB of memory:</p>
+  <div class="code"><button class="copy" type="button" data-copy="ex-self">Copy</button><pre id="ex-self">git clone https://github.com/abutauskas/debussy &amp;&amp; cd debussy
+pip install llama-cpp-python==0.3.36 numpy pandas pyarrow scikit-learn
+mkdir -p models &amp;&amp; curl -L -o models/Qwen3.5-4B-Q4_K_M.gguf \
+  https://huggingface.co/unsloth/Qwen3.5-4B-GGUF/resolve/main/Qwen3.5-4B-Q4_K_M.gguf
+python -m debussy.server --variant light --port 8000
+# then call http://127.0.0.1:8000/v1/wildguard (no Authorization header needed)</pre></div>
+  <p>For the Duo and K2 variants, start K2-Horizon with llama.cpp's <code class="inline">llama-server</code> first; see the
+    <a href="https://github.com/abutauskas/debussy/blob/HEAD/docs/K2_EXPERIMENT.md">K2 notes</a>.</p>
+</div></article>
+</main>
+
+<!-- footer -->
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <a class="brand" href="/">
+        <svg viewBox="0 0 128 128" aria-hidden="true"><g transform="translate(-4 2)" fill="currentColor"><path d="M67.37 68.84 A23 23 0 1 1 33.29 70.32 A17.5 17.5 0 0 0 67.37 68.84 Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M69 81 L69 41 C69 21, 97 17, 100.5 35.5 C103 50, 86.5 55, 82 44.5" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></g></svg>
+        Debussy Labs
+      </a>
+      <nav aria-label="Footer">
+        <a href="/docs/">API docs</a>
+        <a href="/news/">News</a>
+        <a href="https://github.com/abutauskas/debussy">GitHub</a>
+        <a href="https://github.com/abutauskas/debussy/blob/HEAD/hf/README.md">Model card</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="https://github.com/abutauskas/debussy/blob/HEAD/LICENSE">Licence</a>
+      </nav>
+    </div>
+    <p class="credit">Debussy is released under Apache-2.0 and builds on Qwen3.5-4B and K2-Horizon-7B (both Apache-2.0) and llama.cpp.
+      Built with help from Claude, Anthropic's AI assistant. Debussy is not an Anthropic model. Named after the composer
+      Claude Debussy: the logo is a <em>Clair de lune</em> crescent and an <em>Arabesque</em> curl.</p>
+    <p>© 2026 Debussy Labs</p>
+  </div>
+</footer>
+<!-- /footer -->
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>
