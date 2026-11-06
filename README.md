@@ -7,7 +7,7 @@ option. When unsure, Debussy prefers an honest "I don't know" over a guess.
 
 **Estimated Decision Index ≈ 63.7** with two specialists (`DebussyDuo`: Qwen3.5-4B for tool calls, K2-Horizon-7B for
 safety and knowledge): When2Call 93.2 · WildGuardTest 0.936 · HLE 15.0 · Omniscience stand-in 53.1. The light
-single-model default (`Debussy()`, Qwen3.5-4B only) is ≈ 61.4. These are our own estimates, not official scores. Details, methods and caveats: **[docs/RESULTS.md](docs/RESULTS.md)**.
+single-model default (`Debussy()`, Qwen3.5-4B only) is ≈ 61.4. These are our own estimates, not official scores. Model page: **[huggingface.co/debussylabs/debussy](https://huggingface.co/debussylabs/debussy)**. Details, methods and caveats: **[docs/RESULTS.md](docs/RESULTS.md)**.
 
 ## Use it
 ```bash

@@ -9,5 +9,9 @@
    It creates the tag `v0.1.1`, the release "Debussy 0.1.1" with the notes from `CHANGELOG.md`, and attaches
    `debussy-0.1.1-heads.zip` (both heads files, LICENSE, NOTICE, CHANGELOG).
 
+If the repository secret `HF_TOKEN` (a Hugging Face token with write access to `debussylabs`) is set under
+**Settings → Secrets and variables → Actions**, the same run also updates huggingface.co/debussylabs/debussy
+(`scripts/release/hf_upload.py`). Without it, run that script yourself after the release.
+
 If you publish a release by hand instead, the same workflow attaches the zip to it. Running the workflow again for an
 existing version refreshes its notes and zip (that is also how to add files to a release that has none).
