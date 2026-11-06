@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Releases · Debussy Labs</title>
+<meta name="description" content="Debussy releases: what changed in each version, the scores, and what didn't work.">
+<meta name="theme-color" content="#f4f1e8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12102e" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/assets/debussy-mark.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/debussy-mark-512.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Releases">
+<meta property="og:description" content="An open System 1 decision model for AI agents, built on a 4-core CPU with no GPU and no API key.">
+<meta property="og:url" content="https://debussylabs.com/releases/">
+<meta property="og:image" content="https://debussylabs.com/assets/social.png">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+
+<!-- header -->
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Debussy Labs home">
+      <svg viewBox="0 0 128 128" aria-hidden="true"><g transform="translate(-4 2)" fill="currentColor"><path d="M67.37 68.84 A23 23 0 1 1 33.29 70.32 A17.5 17.5 0 0 0 67.37 68.84 Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M69 81 L69 41 C69 21, 97 17, 100.5 35.5 C103 50, 86.5 55, 82 44.5" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></g></svg>
+      Debussy Labs
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="/#model">Model</a>
+      <a href="/#benchmarks">Benchmarks</a>
+      <a href="/docs/">API docs</a>
+      <a href="/news/">News</a>
+      <a href="/releases/">Releases</a>
+      <a href="https://github.com/abutauskas/Debussy">GitHub</a>
+    </nav>
+    <button class="theme-btn" type="button" data-theme-toggle aria-label="Switch theme">☾</button>
+    <a class="btn btn-primary btn-small" href="/login/">API access</a>
+  </div>
+</header>
+<!-- /header -->
+
+<main>
+<article class="wrap"><div class="article" style="padding-top:56px">
+  <span class="eyebrow"><span class="dot"></span>Releases</span>
+  <h1>Releases</h1>
+  <p class="lede">Every version of Debussy: what changed, how it scores, and what didn't work.</p>
+
+  <section id="v0.1.0" style="padding:0">
+    <h2 style="display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 14px">Debussy 0.1.0 <span class="pill ok" style="font-size:12px">Latest</span></h2>
+    <div class="meta"><span>November 6, 2026</span><span>·</span><span>First release</span><span>·</span>
+      <a href="https://github.com/abutauskas/Debussy/releases/tag/v0.1.0">GitHub release</a><span>·</span><a href="/news/introducing-debussy/">Announcement</a></div>
+    <p>The first release of Debussy, an open System 1 decision model for AI agents: safety judgements, tool-call routing and
+      knowledge questions with an honest “I don't know”, each in a single pass, built on a 4-core CPU.</p>
+
+    <h3>Variants</h3>
+    <div class="table-scroll"><table class="data">
+      <thead><tr><th>Variant</th><th>Base model(s)</th><th>RAM</th><th>Estimated index</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Debussy Duo</strong> (recommended)</td><td>Qwen3.5-4B for tool calls, K2-Horizon-7B for safety and knowledge</td><td class="num">~9 GB</td><td class="num"><strong>≈ 63.7</strong></td></tr>
+        <tr><td>Debussy K2</td><td>K2-Horizon-7B, thinking switched off</td><td class="num">~6 GB</td><td class="num">≈ 62.8</td></tr>
+        <tr><td>Debussy Light</td><td>Qwen3.5-4B</td><td class="num">~3 GB</td><td class="num">≈ 61.4</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Results</h3>
+    <div class="table-scroll"><table class="data">
+      <thead><tr><th>Benchmark</th><th>Duo</th><th>Light</th><th>Test set</th></tr></thead>
+      <tbody>
+        <tr><td>When2Call (accuracy)</td><td class="num">93.2%</td><td class="num">93.2%</td><td>600 test questions</td></tr>
+        <tr><td>WildGuardTest (average F1)</td><td class="num">0.936</td><td class="num">0.905</td><td>the same 500 annotator-agreed rows</td></tr>
+        <tr><td>AA-Omniscience stand-in</td><td class="num">53.1</td><td class="num">51.8</td><td>266 public questions</td></tr>
+        <tr><td>HLE-MultiChoice (accuracy)</td><td class="num">15.0%</td><td class="num">10.5%</td><td>all 513 (chance 16.4%)</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small muted">Our estimates, not official Artificial Analysis scores. WildGuardTest uses the annotator-agreed rows, so it is not
+      comparable with guard-model results on the full test set.</p>
+
+    <h3>What's in it</h3>
+    <ul>
+      <li><strong>Package:</strong> <code class="inline">Debussy</code> and <code class="inline">DebussyDuo</code>, plus an HTTP API server
+        (<code class="inline">python -m debussy.server</code>) with the same endpoints as the hosted API.</li>
+      <li><strong>Calibrated heads</strong> for both base models: safety heads fitted on 718 calibration rows, a tool-call head, an
+        “I don't know” threshold, and a letter-bias correction.</li>
+      <li><strong>Fair letters:</strong> K2-Horizon leans towards some answer letters; correcting it, as chosen on practice questions only,
+        took HLE-MultiChoice from 13.6% to 15.0%.</li>
+      <li><strong>debussylabs.com:</strong> model page, news, API docs and privacy notice. Sign-in and API keys are built and switched off
+        until the hosted API opens.</li>
+    </ul>
+
+    <h3>Checked</h3>
+    <ul>
+      <li>The packaged model makes the same decisions as the research pipeline (K2-Horizon: 5/5 tool-call and 15/15 safety
+        decisions, largest probability difference 0.0000).</li>
+      <li>Every setting was chosen on training or practice data only; each test set was used once, to report.</li>
+    </ul>
+
+    <h3>What didn't work</h3>
+    <ul>
+      <li>Probes on K2-Horizon's internal state, for knowledge (51.8 vs 53.1) and for safety (0.927 vs 0.936 on test), did not beat the simpler rules.</li>
+      <li>Combining the two models' knowledge answers, and Wikipedia retrieval for obscure questions.</li>
+      <li>Both variants are below chance on HLE-MultiChoice.</li>
+    </ul>
+
+    <h3>Known limitations</h3>
+    <ul>
+      <li>About 13 s per safety judgement on a 4-core CPU; GPU and laptop speeds not yet measured.</li>
+      <li>English only; the safety judge reads the first 600 tokens of the request and of the reply.</li>
+      <li>One signal for a safety system, not a complete one.</li>
+    </ul>
+    <p><a href="https://github.com/abutauskas/Debussy/blob/HEAD/CHANGELOG.md">Full changelog</a> · <a href="https://github.com/abutauskas/Debussy/blob/HEAD/hf/README.md">Model card</a> ·
+      <a href="https://github.com/abutauskas/Debussy">Source on GitHub</a></p>
+  </section>
+</div></article>
+</main>
+
+<!-- footer -->
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <a class="brand" href="/">
+        <svg viewBox="0 0 128 128" aria-hidden="true"><g transform="translate(-4 2)" fill="currentColor"><path d="M67.37 68.84 A23 23 0 1 1 33.29 70.32 A17.5 17.5 0 0 0 67.37 68.84 Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M69 81 L69 41 C69 21, 97 17, 100.5 35.5 C103 50, 86.5 55, 82 44.5" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></g></svg>
+        Debussy Labs
+      </a>
+      <nav aria-label="Footer">
+        <a href="/docs/">API docs</a>
+        <a href="/news/">News</a>
+        <a href="/releases/">Releases</a>
+        <a href="https://github.com/abutauskas/Debussy">GitHub</a>
+        <a href="https://github.com/abutauskas/Debussy/blob/HEAD/hf/README.md">Model card</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="https://github.com/abutauskas/Debussy/blob/HEAD/LICENSE">Licence</a>
+      </nav>
+    </div>
+    <p class="credit">Debussy is released under Apache-2.0 and builds on Qwen3.5-4B and K2-Horizon-7B (both Apache-2.0) and llama.cpp.
+      Built with help from Claude, Anthropic's AI assistant. Debussy is not an Anthropic model. Named after the composer
+      Claude Debussy: the logo is a <em>Clair de lune</em> crescent and an <em>Arabesque</em> curl.</p>
+    <p>© 2026 Debussy Labs</p>
+  </div>
+</footer>
+<!-- /footer -->
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

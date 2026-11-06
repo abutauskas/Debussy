@@ -1,10 +1,12 @@
-"""Debussy: a System 1 decision model.
+"""Debussy: a System 1 decision model (version 0.1.0).
 
     from debussy import Debussy
     d = Debussy()
 
 Heavy imports (llama.cpp) are loaded lazily, so `import debussy.paths` stays light.
 """
+
+__version__ = "0.1.0"
 
 
 def __getattr__(name):
