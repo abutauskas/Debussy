@@ -9,6 +9,7 @@ usage (examples):
   ... python transfer_run.py wg_more_cal 150 468         # WildGuard calibration rows 150..467 of all_rows() (own file)
   ... python transfer_run.py wg_more_test 300 500        # WildGuard test rows 300..499 of all_rows() (own file)
   ... python transfer_run.py hle_practice 600            # HLE-shaped MMLU-Pro practice set (letter-bias correction)
+  ... python transfer_run.py wg_full 0 1225             # the rest of the full WildGuardTest (all 1,725 rows)
 Outputs go to data/<profile>/<skill>.json (resumable). Then score with the existing scripts, e.g.
   python hle_eval.py --score data/k2-horizon/hle.json
 """
@@ -169,6 +170,21 @@ def run_w2c_more_test(e, start, end):
     resumable(f"w2c_test_{start}to{end}", items, lambda it: _w2c_row(e, it))
 
 
+def wg_full_rest():
+    """The full WildGuardTest (all 1,725 rows) minus the 500 annotator-agreed rows of all_rows(), in file order."""
+    import pandas as pd
+    from debussy.skills.wildguard_rows import all_rows
+    done = {(r["prompt"], r["response"]) for s, r in all_rows() if s == "te"}
+    te = pd.read_parquet(os.path.join(HERE, "data/wg_wildguard_test.parquet"))
+    return [r for _, r in te.iterrows() if (r["prompt"], r["response"]) not in done]
+
+
+def run_wg_full(e, start, end):
+    """Rows [start, end) of wg_full_rest(): with the 500 rows already judged, this covers the full WildGuardTest."""
+    judge = _wg_judge(e)
+    resumable(f"wg_full_{start}_{end}", wg_full_rest()[start:end], lambda r: {"split": "te_full", **judge(r)})
+
+
 def run_wg_natural(e, n, batch):
     """WildGuard calibration rows at the natural label mix (same rows as Qwen's wildguard_natural_train.py run)."""
     from debussy.skills.wildguard_rows import natural_rows
@@ -184,6 +200,7 @@ if __name__ == "__main__":
      "w2c": lambda: run_w2c(e, *(args or [200, 300])), "wg": lambda: run_wg(e, *(args or [300, 500])),
      "wg_natural": lambda: run_wg_natural(e, *(args or [170, 1])),
      "hle_practice": lambda: run_hle_practice(e, *(args or [600])),
+     "wg_full": lambda: run_wg_full(e, *args),
      "wg_more_cal": lambda: run_wg_range(e, "tr", *args), "wg_more_test": lambda: run_wg_range(e, "te", *args),
      "w2c_more_train": lambda: run_w2c_more_train(e, *(args or [100, 250])),
      "w2c_more_test": lambda: run_w2c_more_test(e, *(args or [150, 300]))}[skill]()
