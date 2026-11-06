@@ -86,7 +86,7 @@ rows with the same calibration rows, the Qwen-only judge scores 0.905.
 ## Quick start
 
 ```bash
-git clone https://github.com/abutauskas/Debussy && cd debussy
+git clone https://github.com/abutauskas/Debussy && cd Debussy
 pip install llama-cpp-python==0.3.36 numpy pandas pyarrow scikit-learn
 mkdir -p models && curl -L -o models/Qwen3.5-4B-Q4_K_M.gguf \
   https://huggingface.co/unsloth/Qwen3.5-4B-GGUF/resolve/main/Qwen3.5-4B-Q4_K_M.gguf
