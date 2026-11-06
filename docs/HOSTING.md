@@ -33,6 +33,9 @@ Everything except the model server runs on Cloudflare. Until the model server is
    - `GITHUB_CLIENT_SECRET`: type **Secret** (never commit it or paste it anywhere else)
 4. Redeploy, then try **Sign in** on the site. You'll land on the waitlist screen.
 
+Sign-in always runs on `https://debussylabs.com` (visitors on `www` or the `*.pages.dev` address are sent there
+first), because GitHub only returns to the registered callback URL. If the main address ever changes, set `SITE_URL`.
+
 Optional variables: `AUTO_APPROVE` (`true` skips the waitlist), `RATE_PER_MINUTE` (20), `RATE_PER_DAY` (500),
 `MAX_KEYS` per user (5).
 

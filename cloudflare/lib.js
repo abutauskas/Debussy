@@ -63,3 +63,10 @@ export function redirect(location, cookies = []) {
 }
 
 export const intEnv = (env, name, dflt) => { const v = parseInt((env && env[name]) || "", 10); return Number.isFinite(v) && v > 0 ? v : dflt; };
+
+/** The one address sign-in uses (it must match the GitHub OAuth app's callback URL). SITE_URL, default debussylabs.com. */
+export function siteOrigin(env, request) {
+  const host = new URL(request.url).hostname;
+  if (["127.0.0.1", "localhost"].includes(host)) return new URL(request.url).origin;   // local testing
+  return new URL((env && env.SITE_URL) || "https://debussylabs.com").origin;
+}

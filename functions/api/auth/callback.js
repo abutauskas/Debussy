@@ -1,6 +1,6 @@
 // GET /api/auth/callback: GitHub sends the user back here. We check the state, read the GitHub profile once
 // (the GitHub token is not stored), create or update the account, and start a session.
-import { OAUTH_COOKIE, SESSION_COOKIE, SESSION_DAYS, getCookie, now, randomBase62, redirect, setCookie, sha256hex } from "../../../cloudflare/lib.js";
+import { OAUTH_COOKIE, SESSION_COOKIE, SESSION_DAYS, getCookie, now, randomBase62, redirect, setCookie, sha256hex, siteOrigin } from "../../../cloudflare/lib.js";
 
 const fail = (code) => redirect(`/login/?error=${code}`, [setCookie(OAUTH_COOKIE, "", 0)]);
 
@@ -15,7 +15,7 @@ export async function onRequestGet({ request, env }) {
   const tokenRes = await fetch((local && env.GITHUB_TOKEN_URL) || "https://github.com/login/oauth/access_token", {
     method: "POST", headers: { accept: "application/json", "content-type": "application/json" },
     body: JSON.stringify({ client_id: env.GITHUB_CLIENT_ID, client_secret: env.GITHUB_CLIENT_SECRET, code,
-                           redirect_uri: new URL("/api/auth/callback", request.url).toString() }),
+                           redirect_uri: siteOrigin(env, request) + "/api/auth/callback" }),
   });
   const token = tokenRes.ok ? (await tokenRes.json()).access_token : null;
   if (!token) return fail("github");
