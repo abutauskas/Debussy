@@ -58,6 +58,9 @@ Every comparison below uses **identical training/calibration rows and identical 
   then applied once to HLE: **13.6% → 15.0%** (about 7 more right answers of 513; on its own within noise, but in the
   direction the practice set predicted). It is part of `heads_k2-horizon.json` and applies to 5-10 options only.
   Code: `transfer_run.py hle_practice`, `scripts/score/hle_letter_bias.py`.
+- **On the full WildGuardTest (all 1,725 rows) Debussy's safety judge is about level with WildGuard-7B**: average F1
+  83.9 vs 84.3 (harmful request 83.9 vs 88.9, harmful reply 76.9 vs 75.4, refusal 91.0 vs 88.6), below GPT-4 (85.9).
+  The annotator-agreed subset (0.936) is easier. Details: `WILDGUARD_FULL.md`.
 - **Small-sample swings are real.** K2's HLE lead looked like +5 on the first 150 questions and settled at +3 over 513.
 - Fixes found along the way (they help both models): a train-chosen "tool exists" cut-off (Qwen 92.8 → 93.2% on When2Call),
   token-based trimming of over-long inputs, and llama-server settings that fit 15 GB of RAM (`--cache-ram 0`).

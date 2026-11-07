@@ -20,6 +20,8 @@ the logits instead of generating, then tiny logistic heads calibrate the decisio
 
 **Numbers** (our estimates on the Artificial Analysis Decision Index parts, not official): When2Call 93.2%, WildGuardTest
 0.936 (annotator-agreed rows only), Omniscience stand-in 53.1, HLE-MC 15.0% (below chance). Estimated index ≈ 63.7.
+On the **full** WildGuardTest (1,725 rows) the safety judge averages F1 83.9 vs WildGuard-7B's published 84.3:
+better on harmful replies (76.9 vs 75.4) and refusals (91.0 vs 88.6), worse on harmful requests (83.9 vs 88.9).
 
 **Speed on a 4-core cloud CPU:** a safety judgement ~13 s with K2 (Q4_K_M), a tool-call decision ~6 s with Qwen 4B,
 a knowledge question ~1–3 s. Haven't measured GPUs yet.

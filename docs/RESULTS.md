@@ -27,6 +27,8 @@ questions are private. See the caveats below.
 
 These are the numbers for the default Debussy (Qwen3.5-4B). The same skills on K2-Horizon-7B, and a two-specialist
 variant that uses both models (≈ 63.7), are compared on identical rows in **[K2_EXPERIMENT.md](K2_EXPERIMENT.md)**.
+On the full WildGuardTest (all 1,725 rows, the set guard models report on) the Duo's safety judge averages F1 83.9,
+about level with WildGuard-7B (84.3): **[WILDGUARD_FULL.md](WILDGUARD_FULL.md)**.
 
 ## How each part works
 

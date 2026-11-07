@@ -14,6 +14,6 @@ doesn't sound like you, and post it yourself.
 | `startup-credits.md` | Cloudflare for Startups, Microsoft for Startups | Answers for the usual application questions. |
 
 Facts every draft uses (keep them consistent): estimated Decision Index ≈ 63.7 for the Duo (our estimate, not an
-official score); When2Call 93.2%; WildGuardTest F1 0.936 on the annotator-agreed rows (not comparable with guard models'
-full-test numbers); HLE-MultiChoice 15.0% (below the 16.4% chance level); Omniscience stand-in 53.1; built and evaluated
+official score); When2Call 93.2%; WildGuardTest F1 0.936 on the annotator-agreed rows, and 83.9 on the full 1,725-row test
+(WildGuard-7B: 84.3, GPT-4: 85.9, published); HLE-MultiChoice 15.0% (below the 16.4% chance level); Omniscience stand-in 53.1; built and evaluated
 on a 4-core CPU; Apache-2.0; built with help from Claude, not an Anthropic model.

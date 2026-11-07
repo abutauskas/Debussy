@@ -15,8 +15,9 @@ base models' weights are unchanged. Everything ran on a 4-core cloud CPU: no GPU
 
 Our own estimates on the four parts of the Artificial Analysis Decision Index (not official scores):
 - When2Call (tool calls): 93.2%
-- WildGuardTest (safety): F1 0.936 on the rows where all annotators agree, which is the subset Artificial Analysis
-  uses. That's easier than the full test set guard models usually report, so please don't compare it with those.
+- WildGuardTest (safety): F1 0.936 on the rows where all annotators agree (the subset Artificial Analysis uses). On the
+  full 1,725-row test set that guard models report on, it averages 83.9, about level with WildGuard-7B's published
+  84.3 (better on harmful replies and refusals, worse on harmful requests) and below GPT-4's 85.9.
 - Omniscience stand-in (knowledge with "I don't know"): 53.1. On obscure questions it answers only 9% of the time,
   and when it doesn't know it says so 98% of the time instead of guessing.
 - HLE-MultiChoice: 15.0%, below chance (16.4%). A System 1 model doesn't solve these, and we don't pretend otherwise.
