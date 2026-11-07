@@ -1,5 +1,16 @@
 # Releases
 
+## Unreleased
+
+- **Full WildGuardTest** (all 1,725 rows, the set guard models report on): the Duo's safety judge averages F1 83.9,
+  about level with WildGuard-7B's published 84.3 (harmful request 83.9 / harmful reply 76.9 / refusal 91.0). The
+  annotator-agreed subset (0.936) is easier. `docs/WILDGUARD_FULL.md`.
+- **Debussy Mini (Qwen3.5-2B) did not work out:** safety F1 0.716 against 0.905 for Light on the same rows, for only
+  about 20-30% more speed. Not shipped. `docs/MINI_EXPERIMENT.md`.
+- **Try it free in Google Colab:** `notebooks/try_debussy.ipynb` (tested end to end).
+- Demo app for Hugging Face Spaces (`hf/space/`, waiting for a host), launch drafts (`docs/launch/`), and a guide to
+  running the API server on your own PC or a GPU server (`docs/DEPLOY.md`).
+
 ## 0.1.0 (November 6, 2026): first release
 
 Debussy is an open **System 1 decision model** for AI agents. It makes three kinds of decision, each in a single pass
