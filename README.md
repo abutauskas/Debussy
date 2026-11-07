@@ -10,6 +10,8 @@ safety and knowledge): When2Call 93.2 · WildGuardTest 0.936 · HLE 15.0 · Omni
 single-model default (`Debussy()`, Qwen3.5-4B only) is ≈ 61.4. These are our own estimates, not official scores. Model page: **[huggingface.co/debussylabs/debussy](https://huggingface.co/debussylabs/debussy)**. Details, methods and caveats: **[docs/RESULTS.md](docs/RESULTS.md)**.
 
 ## Use it
+**Try it in your browser, free:** [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/abutauskas/Debussy/blob/main/notebooks/try_debussy.ipynb) (runs Debussy Light in your own Colab session; setup takes a few minutes).
+
 ```bash
 pip install llama-cpp-python==0.3.36 numpy pandas pyarrow scikit-learn
 mkdir -p models && curl -L -o models/Qwen3.5-4B-Q4_K_M.gguf \
