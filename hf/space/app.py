@@ -17,7 +17,7 @@ LIMIT = 4000
 
 
 def timed(fn):
-    t0 = time.time(); out = fn(); return out, f"Decided in {time.time() - t0:.1f} s: one pass, on a free 2-core CPU."
+    t0 = time.time(); out = fn(); return out, f"Decided in {time.time() - t0:.1f} s: one pass, on this machine's CPU."
 
 
 def safety(prompt, reply):
@@ -78,8 +78,8 @@ HEADER = """
   <img src="https://huggingface.co/spaces/debussylabs/README/resolve/main/debussy-labs-banner.png" alt="Debussy Labs" style="height:64px;display:inline-block">
   <h1 style="margin:14px 0 4px">Debussy: fast decisions, honest answers</h1>
   <p style="margin:0">An open <b>System 1</b> decision model for AI agents. Every decision is one pass, with a probability for every option.</p>
-  <p style="margin:6px 0 0;opacity:.75">This demo runs <b>Debussy Light</b> on Hugging Face's free 2-core CPU, so each decision takes
-  several seconds and requests wait in line. Nothing you type is stored.</p>
+  <p style="margin:6px 0 0;opacity:.75">This demo runs <b>Debussy Light</b> on a free CPU, so each decision takes several seconds
+  (up to about a minute on slow machines) and requests wait in line. Nothing you type is stored.</p>
 </div>
 """
 FOOTER = f"""
