@@ -7,10 +7,32 @@ you control, with `python -m debussy.server`. This page covers where that machin
 |---|---|---|---|
 | **Your own PC** | free (electricity) | CPU: roughly 1–13 s; NVIDIA GPU: probably well under 1 s (not yet measured) | a beta, the demo |
 | **A GPU server** (hourly rental) | paid per hour | probably well under 1 s (not yet measured) | the paid API |
+| **Modal** (serverless GPU, `deploy/modal_app.py`) | pay per second while busy; $30 free usage a month | probably well under 1 s once warm | opening the API |
 | A free CPU server (e.g. Oracle Always Free) | free | about 1–13 s | a beta |
 
 Whichever you choose, the steps are the same: **(1) run the server, (2) connect it with a Cloudflare Tunnel,
 (3) tell the website where it is.** The server never needs an open port.
+
+## The quickest way: Modal
+
+`deploy/modal_app.py` runs Debussy Duo on a Modal GPU with its own web address, so no tunnel is needed. From any
+terminal with Python (your PC, or a GitHub Codespace on this repository):
+
+```bash
+pip install modal
+modal token new                                                   # log in to Modal
+python3 -c "import secrets; print(secrets.token_urlsafe(32))"     # a gateway token: copy it, keep it private
+modal secret create debussy DEBUSSY_GATEWAY_TOKEN=<that token>
+modal deploy deploy/modal_app.py                                  # prints https://<you>--debussy-serve.modal.run
+```
+
+- The first request after a deploy downloads both models into a Modal Volume and starts the GPU (several minutes);
+  after 5 idle minutes the GPU stops, and the next request takes a minute or two to start it again.
+- At most one GPU runs at a time (`max_containers=1`), which caps the cost. Set a spending limit in Modal's settings too.
+- Check it: `curl https://<you>--debussy-serve.modal.run/health`.
+- Then do step 3 below with that address as `INFERENCE_URL` and the same token as `INFERENCE_TOKEN`.
+
+The machine-independent version of the same thing is `deploy/start.sh` (both models + the API, GPU if present).
 
 ## 1. Run the server
 

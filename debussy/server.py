@@ -74,10 +74,13 @@ class FakeModel:
 
 
 def load_model(variant):
+    """light: Qwen in-process, or via DEBUSSY_QWEN_SERVER; k2: K2 via DEBUSSY_K2_SERVER (default 127.0.0.1:8080);
+    duo: both (see DebussyDuo)."""
     from debussy.model import Debussy, DebussyDuo
     if variant == "duo": return DebussyDuo()
-    if variant == "k2": return Debussy(profile="k2-horizon", backend="server")
-    return Debussy()
+    if variant == "k2": return Debussy(profile="k2-horizon", backend="server", server=os.environ.get("DEBUSSY_K2_SERVER"))
+    q = os.environ.get("DEBUSSY_QWEN_SERVER")
+    return Debussy(profile="qwen3.5", backend="server", server=q) if q else Debussy()
 
 
 def make_handler(model, model_name, gateway_token=None):

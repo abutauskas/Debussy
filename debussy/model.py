@@ -122,9 +122,12 @@ class DebussyDuo:
     """Two specialists, one decision each, still single-pass: Qwen3.5-4B for tool-call decisions (When2Call), and
     K2-Horizon-7B for safety judgements (WildGuard) and knowledge questions (choice). Uses about 9 GB of RAM.
     See docs/K2_EXPERIMENT.md for why: each model wins different benchmarks."""
-    def __init__(self, k2_server=None):
-        self.tools = Debussy(profile="qwen3.5", backend="inproc")
-        self.judge = Debussy(profile="k2-horizon", backend="server", server=k2_server)
+    def __init__(self, k2_server=None, qwen_server=None):
+        # Qwen runs in-process unless a llama-server for it is given (argument or DEBUSSY_QWEN_SERVER), as on a GPU host
+        qwen_server = qwen_server or os.environ.get("DEBUSSY_QWEN_SERVER")
+        self.tools = (Debussy(profile="qwen3.5", backend="server", server=qwen_server) if qwen_server
+                      else Debussy(profile="qwen3.5", backend="inproc"))
+        self.judge = Debussy(profile="k2-horizon", backend="server", server=k2_server or os.environ.get("DEBUSSY_K2_SERVER"))
 
     def when2call(self, *a, **kw): return self.tools.when2call(*a, **kw)
     def wildguard(self, *a, **kw): return self.judge.wildguard(*a, **kw)

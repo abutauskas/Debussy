@@ -57,6 +57,7 @@ hf/README.md             model card for Hugging Face (upload with the heads file
 site/                    debussylabs.com: static pages (home, news, releases, API docs, sign-in, dashboard, privacy)
 functions/               Cloudflare Pages Functions: GitHub sign-in, API keys, the /v1 gateway (docs/HOSTING.md)
 cloudflare/              database schema, shared helpers, local test harness
+deploy/                  run the API anywhere: start.sh (both models + API), modal_app.py (Modal GPU)
 data/README.md           how to get the datasets (not stored here; some are gated)
 CHANGELOG.md             release notes (also on debussylabs.com/releases and GitHub Releases)
 .github/workflows/        release.yml: one-click releases (docs/RELEASING.md)
