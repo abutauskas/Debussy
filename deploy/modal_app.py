@@ -6,6 +6,7 @@ One-time setup, from any terminal with Python (your PC or a GitHub Codespace on 
     python3 -c "import secrets; print(secrets.token_urlsafe(32))"     # make a gateway token; keep it
     modal secret create debussy DEBUSSY_GATEWAY_TOKEN=<that token>
     modal deploy deploy/modal_app.py                                  # prints the API's web address
+    (no payment method on Modal yet? DEBUSSY_GPU=cpu modal deploy deploy/modal_app.py runs it on CPUs, slower)
 
 Then set INFERENCE_URL (that address) and INFERENCE_TOKEN (the same token) in Cloudflare Pages; see docs/DEPLOY.md.
 
@@ -16,11 +17,13 @@ to start), and at most one GPU runs at a time, which caps the cost.
 import os
 import modal
 
-GPU = os.environ.get("DEBUSSY_GPU", "T4")        # 16 GB fits both 4-bit models; set DEBUSSY_GPU=L4 for more speed
+GPU = os.environ.get("DEBUSSY_GPU", "T4")        # 16 GB fits both 4-bit models; DEBUSSY_GPU=L4 is faster
+CPU_ONLY = GPU.lower() in ("none", "cpu")       # DEBUSSY_GPU=cpu: no GPU (slower: about 2-10 s per decision)
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 image = (
-    modal.Image.from_registry("ghcr.io/ggml-org/llama.cpp:server-cuda", add_python="3.12")
+    modal.Image.from_registry("ghcr.io/ggml-org/llama.cpp:server" if CPU_ONLY else "ghcr.io/ggml-org/llama.cpp:server-cuda",
+                              add_python="3.12")
     .entrypoint([])                                # the image normally starts llama-server; start.sh does that
     .apt_install("curl")
     .pip_install("numpy", "pandas", "huggingface_hub")
@@ -31,11 +34,14 @@ models = modal.Volume.from_name("debussy-models", create_if_missing=True)
 app = modal.App("debussy")
 
 
-@app.function(image=image, gpu=GPU, volumes={"/models": models}, secrets=[modal.Secret.from_name("debussy")],
-              scaledown_window=300, timeout=24 * 3600, max_containers=1)
+HARDWARE = dict(cpu=4.0, memory=12288) if CPU_ONLY else dict(gpu=GPU)
+
+
+@app.function(image=image, volumes={"/models": models}, secrets=[modal.Secret.from_name("debussy")],
+              scaledown_window=300, timeout=24 * 3600, max_containers=1, **HARDWARE)
 @modal.concurrent(max_inputs=8)                  # requests queue inside; the API answers one decision at a time
 @modal.web_server(port=8000, startup_timeout=1200)
 def serve():
     import subprocess
-    env = dict(os.environ, MODELS_DIR="/models", LLAMA_SERVER="/app/llama-server", PORT="8000", NGL="999")
+    env = dict(os.environ, MODELS_DIR="/models", LLAMA_SERVER="/app/llama-server", PORT="8000", NGL="0" if CPU_ONLY else "999")
     subprocess.Popen(["bash", "/root/app/deploy/start.sh"], env=env)
